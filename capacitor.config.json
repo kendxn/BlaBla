@@ -1,0 +1,6 @@
+{
+  "appId": "com.blockblast.evo",
+  "appName": "BlockBlast EVO",
+  "webDir": "www",
+  "bundledWebRuntime": false
+}
