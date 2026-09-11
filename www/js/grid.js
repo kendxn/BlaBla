@@ -582,6 +582,100 @@ function triggerClearVFX(index, isVertical, grid, cellSize, cols, rows) {
   startVFXLoop();
 }
 
+const RAINBOW_COLORS = [
+  '#cc1236',
+  '#cc552a',
+  '#ccab08',
+  '#2dcc10',
+  '#00c0cc',
+  '#2945bc',
+  '#6e22b4',
+  '#8337cc'
+];
+
+function triggerRainbowSweep(clearedRows, clearedCols) {
+  const { canvas: vfxCanvas } = getVfxContext();
+  const cellSize = (vfxCanvas ? vfxCanvas.width : boardElement.clientWidth) / BOARD_SIZE;
+
+  // FASE 1: COLORAZIONE ARCOBALENO
+  clearedRows.forEach(rowIndex => {
+    let blockIndex = 0;
+    for (let c = 0; c < BOARD_SIZE; c++) {
+      if (boardState[rowIndex][c]) {
+        boardState[rowIndex][c] = RAINBOW_COLORS[blockIndex % RAINBOW_COLORS.length];
+        blockIndex++;
+      }
+    }
+  });
+
+  clearedCols.forEach(colIndex => {
+    let blockIndex = 0;
+    for (let r = 0; r < BOARD_SIZE; r++) {
+      if (boardState[r][colIndex]) {
+        boardState[r][colIndex] = RAINBOW_COLORS[blockIndex % RAINBOW_COLORS.length];
+        blockIndex++;
+      }
+    }
+  });
+
+  clearedRows.forEach(r => {
+    flashes.push(new Flash(0, r * cellSize, BOARD_SIZE * cellSize, cellSize, RAINBOW_COLORS[0], false));
+  });
+  clearedCols.forEach(c => {
+    flashes.push(new Flash(c * cellSize, 0, cellSize, BOARD_SIZE * cellSize, RAINBOW_COLORS[4], true));
+  });
+
+  renderBoard();
+  startVFXLoop();
+
+  // FASE 2: ANIMAZIONE DI PULIZIA SEQUENZIALE (SWEEP)
+  setTimeout(() => {
+    const SWEEP_DELAY = 20; 
+
+    // Pulizia RIGHE (da sinistra a destra)
+    clearedRows.forEach(rowIndex => {
+      for (let c = 0; c < BOARD_SIZE; c++) {
+        setTimeout(() => {
+          if (boardState[rowIndex] && boardState[rowIndex][c] !== null) {
+            const val = boardState[rowIndex][c];
+            const blockColor = (typeof val === 'object' && val.center) ? val.center : (val.color || val);
+            const px = (c + 0.5) * cellSize;
+            const py = (rowIndex + 0.5) * cellSize;
+
+            disintegrations.push(new Disintegration(px, py, cellSize * 0.8, blockColor, false));
+            spawnParticles(px, py, blockColor, false);
+            startVFXLoop();
+
+            boardState[rowIndex][c] = null;
+            renderBoard();
+          }
+        }, c * SWEEP_DELAY);
+      }
+    });
+
+    // Pulizia COLONNE (dall'alto verso il basso)
+    clearedCols.forEach(colIndex => {
+      for (let r = 0; r < BOARD_SIZE; r++) {
+        setTimeout(() => {
+          if (boardState[r] && boardState[r][colIndex] !== null) {
+            const val = boardState[r][colIndex];
+            const blockColor = (typeof val === 'object' && val.center) ? val.center : (val.color || val);
+            const px = (colIndex + 0.5) * cellSize;
+            const py = (r + 0.5) * cellSize;
+
+            disintegrations.push(new Disintegration(px, py, cellSize * 0.8, blockColor, true));
+            spawnParticles(px, py, blockColor, true);
+            startVFXLoop();
+
+            boardState[r][colIndex] = null;
+            renderBoard();
+          }
+        }, r * SWEEP_DELAY);
+      }
+    });
+  }, 150);
+}
+
 function checkLines() {
     let rowsToClear = [];
     let colsToClear = [];
@@ -610,24 +704,6 @@ function checkLines() {
         boardElement.classList.add('shaking');
     }
 
-    const { canvas: vfxCanvas } = getVfxContext();
-    const cellSize = (vfxCanvas ? vfxCanvas.width : boardElement.clientWidth) / BOARD_SIZE;
-
-    rowsToClear.forEach(r => {
-        triggerClearVFX(r, false, boardState, cellSize, BOARD_SIZE, BOARD_SIZE);
-    });
-
-    colsToClear.forEach(c => {
-        triggerClearVFX(c, true, boardState, cellSize, BOARD_SIZE, BOARD_SIZE);
-    });
-
-    rowsToClear.forEach(r => {
-        for (let c = 0; c < BOARD_SIZE; c++) boardState[r][c] = null;
-    });
-    colsToClear.forEach(c => {
-        for (let r = 0; r < BOARD_SIZE; r++) boardState[r][c] = null;
-    });
-
     const linesCleared = rowsToClear.length + colsToClear.length;
     let points = linesCleared * 10;
     if (linesCleared > 1) points += linesCleared * 5;
@@ -640,7 +716,30 @@ function checkLines() {
         }
     }
     updateSkillUI();
-    renderBoard();
+
+    if (linesCleared > 1) {
+        triggerRainbowSweep(rowsToClear, colsToClear);
+    } else {
+        const { canvas: vfxCanvas } = getVfxContext();
+        const cellSize = (vfxCanvas ? vfxCanvas.width : boardElement.clientWidth) / BOARD_SIZE;
+
+        rowsToClear.forEach(r => {
+            triggerClearVFX(r, false, boardState, cellSize, BOARD_SIZE, BOARD_SIZE);
+        });
+
+        colsToClear.forEach(c => {
+            triggerClearVFX(c, true, boardState, cellSize, BOARD_SIZE, BOARD_SIZE);
+        });
+
+        rowsToClear.forEach(r => {
+            for (let c = 0; c < BOARD_SIZE; c++) boardState[r][c] = null;
+        });
+        colsToClear.forEach(c => {
+            for (let r = 0; r < BOARD_SIZE; r++) boardState[r][c] = null;
+        });
+
+        renderBoard();
+    }
 }
 
 function checkGameOver() {
