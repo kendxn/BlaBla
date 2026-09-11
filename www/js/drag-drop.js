@@ -61,6 +61,8 @@ function showPreview(shape, row, col) {
             }
         }
     });
+    lastPreviewRow = row;
+    lastPreviewCol = col;
 }
 
 function createPieceElement(shape, slotIndex, rotated = false) {
@@ -160,24 +162,37 @@ function createPieceElement(shape, slotIndex, rotated = false) {
 
         turnHasDragged = true;
         updateSkillUI();
+
+        let targetRow = -1;
+        let targetCol = -1;
+        if (lastPreviewRow !== -1 && lastPreviewCol !== -1 && canPlace(dragState.shape.matrix, lastPreviewRow, lastPreviewCol)) {
+            targetRow = lastPreviewRow;
+            targetCol = lastPreviewCol;
+        } else {
+            const scaledRect = element.getBoundingClientRect();
+            const boardRect = boardElement.getBoundingClientRect();
+            const cellWidth = boardRect.width / BOARD_SIZE;
+            const cellHeight = boardRect.height / BOARD_SIZE;
+
+            const dropX = scaledRect.left - boardRect.left;
+            const dropY = scaledRect.top - boardRect.top;
+
+            const col = Math.floor((dropX + cellWidth * 0.25) / cellWidth);
+            const row = Math.floor((dropY + cellHeight * 0.25) / cellHeight);
+
+            if (canPlace(dragState.shape.matrix, row, col)) {
+                targetRow = row;
+                targetCol = col;
+            }
+        }
+
         clearPreview();
 
-        const scaledRect = element.getBoundingClientRect();
         element.classList.remove('dragging');
         element.style.transform = '';
-        
-        const boardRect = boardElement.getBoundingClientRect();
-        const cellWidth = boardRect.width / BOARD_SIZE;
-        const cellHeight = boardRect.height / BOARD_SIZE;
 
-        const dropX = scaledRect.left - boardRect.left;
-        const dropY = scaledRect.top - boardRect.top;
-
-        const col = Math.floor((dropX + cellWidth / 2) / cellWidth);
-        const row = Math.floor((dropY + cellHeight / 2) / cellHeight);
-
-        if (canPlace(dragState.shape.matrix, row, col)) {
-            placePiece(dragState.shape, row, col);
+        if (targetRow !== -1 && targetCol !== -1) {
+            placePiece(dragState.shape, targetRow, targetCol);
             element.remove();
             activePieces = activePieces.filter(p => p.slot !== slotIndex);
             
@@ -231,8 +246,8 @@ function onDrag(e) {
         const dropX = scaledRect.left - boardRect.left;
         const dropY = scaledRect.top - boardRect.top;
         
-        const col = Math.floor((dropX + cellWidth / 2) / cellWidth);
-        const row = Math.floor((dropY + cellHeight / 2) / cellHeight);
+        const col = Math.floor((dropX + cellWidth * 0.25) / cellWidth);
+        const row = Math.floor((dropY + cellHeight * 0.25) / cellHeight);
 
         if (row !== lastPreviewRow || col !== lastPreviewCol) {
             lastPreviewRow = row;

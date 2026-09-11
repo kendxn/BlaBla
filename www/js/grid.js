@@ -10,6 +10,7 @@ const canvas = document.getElementById('confetti-canvas');
 const ctx = canvas ? canvas.getContext('2d') : null;
 
 let boardState = [];
+let lastPlacedColor = null;
 let score = 0;
 let highScore = parseInt(localStorage.getItem('blockBlast3DHighScore8x8')) || 0;
 let sessionStartHighScore = highScore;
@@ -119,6 +120,14 @@ function initBoard() {
             boardElement.appendChild(cell);
         }
     }
+    const vfxCanvas = document.createElement('canvas');
+    vfxCanvas.id = 'vfx-canvas';
+    boardElement.appendChild(vfxCanvas);
+
+    particles = [];
+    flashes = [];
+    disintegrations = [];
+
     score = 0;
     linesEliminated = 0;
     skillDiscardActive = false;
@@ -251,6 +260,7 @@ function canPlace(matrix, row, col) {
 }
 
 function placePiece(shape, row, col) {
+    lastPlacedColor = shape.color;
     let blocksPlaced = 0;
     for (let r = 0; r < shape.matrix.length; r++) {
         for (let c = 0; c < shape.matrix[r].length; c++) {
@@ -262,6 +272,314 @@ function placePiece(shape, row, col) {
     }
     updateScore(blocksPlaced);
     renderBoard();
+}
+
+function checkLines() {
+    let rowsToClear = [];
+    let colsToClear = [];
+
+// ==========================================
+// VFX ELEMINATION SYSTEM (Particelle, Bagliori e Disintegrazione)
+// ==========================================
+let particles = [];
+let flashes = [];
+let disintegrations = [];
+let vfxAnimId = null;
+
+function hexToRgba(hex, a) {
+  if (!hex) return `rgba(255, 214, 10, ${a})`;
+  if (typeof hex === 'object' && hex.center) hex = hex.center;
+  if (typeof hex === 'string' && hex.startsWith('rgb')) {
+    return hex.replace('rgb', 'rgba').replace(')', `, ${a})`);
+  }
+  let cleanHex = typeof hex === 'string' ? hex.replace('#', '') : 'ffd60a';
+  if (cleanHex.length === 3) {
+    cleanHex = cleanHex.split('').map(c => c + c).join('');
+  }
+  const r = parseInt(cleanHex.substring(0, 2), 16) || 255;
+  const g = parseInt(cleanHex.substring(2, 4), 16) || 214;
+  const b = parseInt(cleanHex.substring(4, 6), 16) || 10;
+  return `rgba(${r}, ${g}, ${b}, ${a})`;
+}
+
+function colorToRgba(colorObj, a) {
+  if (!colorObj) return `rgba(255, 214, 10, ${a})`;
+  let colorStr = (typeof colorObj === 'object' && colorObj.center) ? colorObj.center : colorObj;
+  return hexToRgba(colorStr, a);
+}
+
+function drawRoundRect(ctx, x, y, w, h, r) {
+  if (w < 2 * r) r = w / 2;
+  if (h < 2 * r) r = h / 2;
+  ctx.beginPath();
+  ctx.moveTo(x+r, y);
+  ctx.arcTo(x+w, y, x+w, y+h, r);
+  ctx.arcTo(x+w, y+h, x, y+h, r);
+  ctx.arcTo(x, y+h, x, y, r);
+  ctx.arcTo(x, y, x+w, y, r);
+  ctx.closePath();
+}
+
+class Particle {
+  constructor(x, y, color, vx, vy) {
+    this.x = x;
+    this.y = y;
+    this.color = color;
+    this.vx = vx;
+    this.vy = vy;
+    this.size = 2 + Math.random() * 5;
+    this.life = 1;
+    this.decay = 0.04 + Math.random() * 0.03;
+    this.friction = 0.94;
+  }
+  
+  update() {
+    this.x += this.vx;
+    this.y += this.vy;
+    this.vx *= this.friction;
+    this.vy *= this.friction;
+    this.life -= this.decay;
+  }
+  
+  draw(ctx) {
+    if (this.life <= 0) return;
+    ctx.save();
+    ctx.globalAlpha = Math.max(0, this.life);
+    ctx.fillStyle = this.color;
+    ctx.shadowColor = this.color;
+    ctx.shadowBlur = 6;
+    const s = Math.max(0.5, this.size * this.life);
+    drawRoundRect(ctx, this.x - s/2, this.y - s/2, s, s, s * 0.10);
+    ctx.fill();
+    ctx.restore();
+  }
+}
+
+class Flash {
+  constructor(x, y, w, h, color, isVertical) {
+    this.x = x;
+    this.y = y;
+    this.w = w;
+    this.h = h;
+    this.color = color;
+    this.life = 1;
+    this.isVertical = isVertical;
+  }
+  
+  update() {
+    this.life -= 0.06;
+  }
+  
+  draw(ctx) {
+    if (this.life <= 0) return;
+    const cx = this.x + this.w / 2;
+    const cy = this.y + this.h / 2;
+    const alpha = Math.max(0, this.life * this.life);
+
+    ctx.save();
+    ctx.beginPath();
+    ctx.rect(this.x, this.y, this.w, this.h);
+    ctx.clip();
+
+    const r = Math.max(this.w, this.h) * 0.8;
+    const grad = ctx.createRadialGradient(cx, cy, 0, cx, cy, r);
+    grad.addColorStop(0, `rgba(255,255,255,${alpha})`);
+    grad.addColorStop(0.3, colorToRgba(this.color, alpha * 0.8));
+    grad.addColorStop(1, 'rgba(0,0,0,0)');
+    
+    ctx.globalAlpha = alpha;
+    ctx.fillStyle = grad;
+    ctx.fillRect(cx - r, cy - r, r * 2, r * 2);
+
+    if (this.isVertical) {
+      const barW = 6 + (1 - this.life) * 9; 
+      ctx.fillStyle = `rgba(255,255,255,${alpha})`;
+      ctx.fillRect(cx - barW/2, this.y, barW, this.h);
+    } else {
+      const barH = 6 + (1 - this.life) * 9; 
+      ctx.fillStyle = `rgba(255,255,255,${alpha})`;
+      ctx.fillRect(this.x, cy - barH/2, this.w, barH);
+    }
+
+    ctx.restore();
+  }
+}
+
+class Disintegration {
+  constructor(x, y, size, color, isVertical) {
+    this.x = x;
+    this.y = y;
+    this.size = size;
+    this.color = color;
+    this.life = 1;
+    this.pixels = [];
+    
+    const n = 2;
+    const pSize = size / n;
+    
+    for (let i = 0; i < n; i++) {
+      for (let j = 0; j < n; j++) {
+        this.pixels.push({
+          ox: (i - 0.5) * pSize,
+          oy: (j - 0.5) * pSize,
+          vx: isVertical ? (Math.random() - 0.5) * 1.5 : (Math.random() < 0.5 ? -1 : 1) * (2 + Math.random() * 3),
+          vy: isVertical ? (Math.random() < 0.5 ? -1 : 1) * (2 + Math.random() * 3) : (Math.random() - 0.5) * 1.5,
+          size: pSize * (0.3 + Math.random() * 0.7)
+        });
+      }
+    }
+  }
+  
+  update() {
+    this.life -= 0.035;
+    for (const p of this.pixels) {
+      p.ox += p.vx;
+      p.oy += p.vy;
+      p.vx *= 0.93;
+      p.vy *= 0.93;
+    }
+  }
+  
+  draw(ctx) {
+    if (this.life <= 0) return;
+    ctx.save();
+    ctx.globalAlpha = Math.max(0, this.life);
+    ctx.fillStyle = this.color;
+    ctx.shadowColor = this.color;
+    ctx.shadowBlur = 6;
+    for (const p of this.pixels) {
+      drawRoundRect(ctx, this.x + p.ox - p.size/2, this.y + p.oy - p.size/2, p.size, p.size, p.size * 0.10);
+      ctx.fill();
+    }
+    ctx.restore();
+  }
+}
+
+function getVfxContext() {
+    let vfxCanvas = document.getElementById('vfx-canvas');
+    if (!vfxCanvas && boardElement) {
+        vfxCanvas = document.createElement('canvas');
+        vfxCanvas.id = 'vfx-canvas';
+        boardElement.appendChild(vfxCanvas);
+    }
+    if (!vfxCanvas || !boardElement) return { canvas: null, ctx: null };
+    const rect = boardElement.getBoundingClientRect();
+    if (vfxCanvas.width !== Math.round(rect.width) || vfxCanvas.height !== Math.round(rect.height)) {
+        vfxCanvas.width = Math.round(rect.width);
+        vfxCanvas.height = Math.round(rect.height);
+    }
+    return { canvas: vfxCanvas, ctx: vfxCanvas.getContext('2d') };
+}
+
+function animateVFX() {
+    const { canvas: vfxCanvas, ctx: vfxCtx } = getVfxContext();
+    if (!vfxCtx || !vfxCanvas) return;
+
+    vfxCtx.clearRect(0, 0, vfxCanvas.width, vfxCanvas.height);
+
+    for (let i = flashes.length - 1; i >= 0; i--) {
+        const f = flashes[i];
+        f.update();
+        f.draw(vfxCtx);
+        if (f.life <= 0) flashes.splice(i, 1);
+    }
+
+    for (let i = disintegrations.length - 1; i >= 0; i--) {
+        const d = disintegrations[i];
+        d.update();
+        d.draw(vfxCtx);
+        if (d.life <= 0) disintegrations.splice(i, 1);
+    }
+
+    for (let i = particles.length - 1; i >= 0; i--) {
+        const p = particles[i];
+        p.update();
+        p.draw(vfxCtx);
+        if (p.life <= 0) particles.splice(i, 1);
+    }
+
+    if (flashes.length > 0 || disintegrations.length > 0 || particles.length > 0) {
+        vfxAnimId = requestAnimationFrame(animateVFX);
+    } else {
+        vfxAnimId = null;
+    }
+}
+
+function startVFXLoop() {
+    if (!vfxAnimId) {
+        vfxAnimId = requestAnimationFrame(animateVFX);
+    }
+}
+
+function spawnParticles(x, y, color, isVertical) {
+  let count = Math.random() < 0.4 ? 2 : 1;
+  for (let i = 0; i < count; i++) {
+    let vx, vy;
+    if (isVertical) {
+      vx = (Math.random() - 0.5) * 4;
+      vy = (Math.random() - 0.5) * 1;
+    } else {
+      vx = (Math.random() - 0.5) * 1;
+      vy = (Math.random() - 0.5) * 4;
+    }
+    particles.push(new Particle(x, y, color, vx, vy));
+  }
+}
+
+function triggerClearVFX(index, isVertical, grid, cellSize, cols, rows) {
+  let lineColor = 'rgb(218, 163, 35)';
+  let colorFound = false;
+  
+  if (lastPlacedColor) {
+    lineColor = (typeof lastPlacedColor === 'object' && lastPlacedColor.center) ? lastPlacedColor.center : (lastPlacedColor.color || lastPlacedColor);
+    colorFound = true;
+  } else if (isVertical) {
+    for (let r = 0; r < rows; r++) {
+      if (grid[r][index]) {
+        const val = grid[r][index];
+        lineColor = (typeof val === 'object' && val.center) ? val.center : (val.color || val);
+        colorFound = true;
+        break;
+      }
+    }
+  } else {
+    for (let c = 0; c < cols; c++) {
+      if (grid[index][c]) {
+        const val = grid[index][c];
+        lineColor = (typeof val === 'object' && val.center) ? val.center : (val.color || val);
+        colorFound = true;
+        break;
+      }
+    }
+  }
+
+  if (!colorFound) return;
+
+  const blockColor = lineColor;
+
+  if (isVertical) {
+    const centerX = (index + 0.5) * cellSize;
+    for (let r = 0; r < rows; r++) {
+      if (grid[r][index]) {
+        const py = (r + 0.5) * cellSize;
+        disintegrations.push(new Disintegration(centerX, py, cellSize * 0.8, blockColor, true));
+        spawnParticles(centerX, py, blockColor, true);
+      }
+    }
+    flashes.push(new Flash(index * cellSize, 0, cellSize, rows * cellSize, lineColor, true));
+  } else {
+    const centerY = (index + 0.5) * cellSize;
+    for (let c = 0; c < cols; c++) {
+      if (grid[index][c]) {
+        const px = (c + 0.5) * cellSize;
+        disintegrations.push(new Disintegration(px, centerY, cellSize * 0.8, blockColor, false));
+        spawnParticles(px, centerY, blockColor, false);
+      }
+    }
+    flashes.push(new Flash(0, index * cellSize, cols * cellSize, cellSize, lineColor, false));
+  }
+
+  startVFXLoop();
 }
 
 function checkLines() {
@@ -291,6 +609,17 @@ function checkLines() {
         void boardElement.offsetWidth;
         boardElement.classList.add('shaking');
     }
+
+    const { canvas: vfxCanvas } = getVfxContext();
+    const cellSize = (vfxCanvas ? vfxCanvas.width : boardElement.clientWidth) / BOARD_SIZE;
+
+    rowsToClear.forEach(r => {
+        triggerClearVFX(r, false, boardState, cellSize, BOARD_SIZE, BOARD_SIZE);
+    });
+
+    colsToClear.forEach(c => {
+        triggerClearVFX(c, true, boardState, cellSize, BOARD_SIZE, BOARD_SIZE);
+    });
 
     rowsToClear.forEach(r => {
         for (let c = 0; c < BOARD_SIZE; c++) boardState[r][c] = null;
