@@ -145,8 +145,7 @@ function createPieceElement(shape, slotIndex, rotated = false) {
             }
 
             if (skillDiscardActive && !turnHasDragged && !isDoubleTap) {
-                const shapesPool = getAvailableShapes();
-                const newShape = shapesPool[Math.floor(Math.random() * shapesPool.length)];
+                const newShape = getRandomPieceShape();
                 if (pieceData) {
                     pieceData.shape = newShape;
                     pieceData.rotated = false;

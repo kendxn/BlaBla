@@ -742,69 +742,104 @@ function checkLines() {
     }
 }
 
+let gameOverCheckTimeout = null;
+
+function getOrCreateNoSpaceOverlay() {
+    let overlay = document.getElementById('no-space-overlay');
+    const trayElement = document.getElementById('tray');
+    if (!overlay && trayElement) {
+        overlay = document.createElement('div');
+        overlay.id = 'no-space-overlay';
+        overlay.innerHTML = '<div class="no-space-text">No space left</div>';
+        trayElement.appendChild(overlay);
+    } else if (overlay && overlay.parentElement !== trayElement && trayElement) {
+        trayElement.appendChild(overlay);
+    }
+    return overlay;
+}
+
 function checkGameOver() {
-    if (activePieces.length === 0) return;
-    let canPlay = false;
-    for (const piece of activePieces) {
-        for (let r = 0; r < BOARD_SIZE; r++) {
-            for (let c = 0; c < BOARD_SIZE; c++) {
-                if (canPlace(piece.shape.matrix, r, c)) {
-                    canPlay = true;
-                    break;
+    if (gameOverCheckTimeout) clearTimeout(gameOverCheckTimeout);
+
+    gameOverCheckTimeout = setTimeout(() => {
+        gameOverCheckTimeout = null;
+        if (activePieces.length === 0 || gameOver) return;
+
+        let canPlay = false;
+        for (const piece of activePieces) {
+            for (let r = 0; r < BOARD_SIZE; r++) {
+                for (let c = 0; c < BOARD_SIZE; c++) {
+                    if (canPlace(piece.shape.matrix, r, c)) {
+                        canPlay = true;
+                        break;
+                    }
                 }
+                if (canPlay) break;
             }
             if (canPlay) break;
         }
-        if (canPlay) break;
-    }
 
-    if (!canPlay && !gameOver) {
-        gameOver = true;
-        triggerGameOver();
-    }
+        if (!canPlay && !gameOver) {
+            gameOver = true;
+            triggerGameOver();
+        }
+    }, 500);
 }
 
 function triggerGameOver() {
-    let delay = 0;
-    for (let r = 0; r < BOARD_SIZE; r++) {
-        for (let c = 0; c < BOARD_SIZE; c++) {
-            if (boardState[r][c]) {
-                setTimeout(() => {
-                    const cell = boardElement.children[r * BOARD_SIZE + c];
-                    const randomColor = COLORS[Math.floor(Math.random() * COLORS.length)];
-                    cell.innerHTML = createGemBlockHTML(randomColor);
-                }, delay);
-                delay += 15;
-            }
-        }
+    const overlay = getOrCreateNoSpaceOverlay();
+    if (overlay) {
+        overlay.classList.add('visible');
     }
 
     setTimeout(() => {
-        const goScoreText = document.getElementById('go-score-text');
-        if(goScoreText) animateNumberValue(goScoreText, 0, score, 800);
-
-        const isNewRecord = achievedNewRecord || (score > sessionStartHighScore);
-
-        if (isNewRecord) {
-            const prevHigh = highScore;
-            highScore = Math.max(highScore, score);
-            localStorage.setItem('blockBlast3DHighScore8x8', highScore);
-            if(highScoreElement) animateNumberValue(highScoreElement, prevHigh, highScore, 400);
-            if(gameOverScreen) gameOverScreen.classList.add('new-high-score');
-            setTimeout(() => {
-                if(typeof shootConfetti === 'function') shootConfetti();
-                else if(typeof spawnConfetti === 'function') spawnConfetti();
-            }, 100);
-        } else {
-            if(gameOverScreen) gameOverScreen.classList.remove('new-high-score');
+        let delay = 0;
+        for (let r = 0; r < BOARD_SIZE; r++) {
+            for (let c = 0; c < BOARD_SIZE; c++) {
+                if (boardState[r][c]) {
+                    setTimeout(() => {
+                        const cell = boardElement.children[r * BOARD_SIZE + c];
+                        if (cell) {
+                            const randomColor = COLORS[Math.floor(Math.random() * COLORS.length)];
+                            cell.innerHTML = createGemBlockHTML(randomColor);
+                        }
+                    }, delay);
+                    delay += 15;
+                }
+            }
         }
-        
-        if(gameOverScreen) {
-            gameOverScreen.classList.remove('visible');
-            void gameOverScreen.offsetWidth;
-            gameOverScreen.classList.add('visible');
-        }
-    }, delay + 500);
+
+        setTimeout(() => {
+            if (overlay) {
+                overlay.classList.remove('visible');
+            }
+
+            const goScoreText = document.getElementById('go-score-text');
+            if(goScoreText) animateNumberValue(goScoreText, 0, score, 800);
+
+            const isNewRecord = achievedNewRecord || (score > sessionStartHighScore);
+
+            if (isNewRecord) {
+                const prevHigh = highScore;
+                highScore = Math.max(highScore, score);
+                localStorage.setItem('blockBlast3DHighScore8x8', highScore);
+                if(highScoreElement) animateNumberValue(highScoreElement, prevHigh, highScore, 400);
+                if(gameOverScreen) gameOverScreen.classList.add('new-high-score');
+                setTimeout(() => {
+                    if(typeof shootConfetti === 'function') shootConfetti();
+                    else if(typeof spawnConfetti === 'function') spawnConfetti();
+                }, 100);
+            } else {
+                if(gameOverScreen) gameOverScreen.classList.remove('new-high-score');
+            }
+            
+            if(gameOverScreen) {
+                gameOverScreen.classList.remove('visible');
+                void gameOverScreen.offsetWidth;
+                gameOverScreen.classList.add('visible');
+            }
+        }, delay + 500);
+    }, 1000);
 }
 
 if(playBtn) {

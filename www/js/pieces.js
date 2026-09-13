@@ -1,60 +1,147 @@
 const BASE_SHAPES = [
-    // Pezzo O (Giallo / Oro)
-    { matrix: [[1,1],[1,1]], color: GEM_COLORS.yellow },
-    // Pezzi I (Ciano / Azzurro & Turchese Chiaro)
-    { matrix: [[1,1]], color: GEM_COLORS.cyan },
-    { matrix: [[1,1,1]], color: GEM_COLORS.cyan },
-    { matrix: [[1,1,1,1]], color: GEM_COLORS.turquoise },
-    { matrix: [[1],[1]], color: GEM_COLORS.cyan },
-    { matrix: [[1],[1],[1]], color: GEM_COLORS.turquoise },
-    { matrix: [[1],[1],[1],[1]], color: GEM_COLORS.cyan },
-    // Pezzi L (Arancione Intenso & Rosa Magenta)
-    { matrix: [[1,0],[1,1]], color: GEM_COLORS.orange },
-    { matrix: [[0,1],[1,1]], color: GEM_COLORS.magenta },
-    { matrix: [[1,1,1],[1,0,0]], color: GEM_COLORS.orange },
-    { matrix: [[1,1,1],[0,0,1]], color: GEM_COLORS.magenta },
-    // Pezzi J (Blu Elettrico & Viola Scuro / Indaco)
-    { matrix: [[1,1],[1,0]], color: GEM_COLORS.blue },
-    { matrix: [[1,1],[0,1]], color: GEM_COLORS.indigo },
-    { matrix: [[1,0,0],[1,1,1]], color: GEM_COLORS.blue },
-    { matrix: [[0,0,1],[1,1,1]], color: GEM_COLORS.indigo },
-    // Pezzi T (Viola & Verde Acqua / Teal)
-    { matrix: [[1,1,1],[0,1,0]], color: GEM_COLORS.purple },
-    { matrix: [[0,1,0],[1,1,1]], color: GEM_COLORS.teal },
-    { matrix: [[1,0],[1,1],[1,0]], color: GEM_COLORS.purple },
-    { matrix: [[0,1],[1,1],[0,1]], color: GEM_COLORS.teal },
-    // Pezzo S (Verde Lime)
-    { matrix: [[0,1,1],[1,1,0]], color: GEM_COLORS.lime },
-    // Pezzo Z (Rosso / Corallo)
-    { matrix: [[1,1,0],[0,1,1]], color: GEM_COLORS.red }
+    // Pezzo O 2x2
+    { matrix: [[1,1],[1,1]] },
+    // Pezzo O 3x3 Grande
+    { matrix: [
+        [1,1,1],
+        [1,1,1],
+        [1,1,1]
+    ] },
+    // Pezzi I 4x1 Orizzontale & Verticale
+    { matrix: [[1,1,1,1]] },
+    { matrix: [[1],[1],[1],[1]] },
+    // Pezzi I 1x2, 1x3, 2x1, 3x1
+    { matrix: [[1,1]] },
+    { matrix: [[1,1,1]] },
+    { matrix: [[1],[1]] },
+    { matrix: [[1],[1],[1]] },
+    // Pezzi L
+    { matrix: [[1,0],[1,1]] },
+    { matrix: [[0,1],[1,1]] },
+    { matrix: [[1,1,1],[1,0,0]] },
+    { matrix: [[1,1,1],[0,0,1]] },
+    // Pezzi L 3x3 (Grandi: alto 3 e largo 3)
+    { matrix: [
+        [1,0,0],
+        [1,0,0],
+        [1,1,1]
+    ] },
+    { matrix: [
+        [0,0,1],
+        [0,0,1],
+        [1,1,1]
+    ] },
+    { matrix: [
+        [1,1,1],
+        [1,0,0],
+        [1,0,0]
+    ] },
+    { matrix: [
+        [1,1,1],
+        [0,0,1],
+        [0,0,1]
+    ] },
+    // Pezzi J
+    { matrix: [[1,1],[1,0]] },
+    { matrix: [[1,1],[0,1]] },
+    { matrix: [[1,0,0],[1,1,1]] },
+    { matrix: [[0,0,1],[1,1,1]] },
+    // Pezzi T
+    { matrix: [[1,1,1],[0,1,0]] },
+    { matrix: [[0,1,0],[1,1,1]] },
+    { matrix: [[1,0],[1,1],[1,0]] },
+    { matrix: [[0,1],[1,1],[0,1]] },
+    // Pezzo S
+    { matrix: [[0,1,1],[1,1,0]] },
+    // Pezzo Z
+    { matrix: [[1,1,0],[0,1,1]] }
 ];
 
-const SINGLE_DOT_SHAPE = { matrix: [[1]], color: GEM_COLORS.yellow };
+const SINGLE_DOT_SHAPE = { matrix: [[1]] };
+
+function canPieceFit(grid, pieceMatrix) {
+    for (let r = 0; r < BOARD_SIZE; r++) {
+        for (let c = 0; c < BOARD_SIZE; c++) {
+            if (canPlace(pieceMatrix, r, c)) {
+                return true;
+            }
+        }
+    }
+    return false;
+}
+
+function isGridCritical(grid) {
+    let filled = 0;
+    const total = BOARD_SIZE * BOARD_SIZE;
+    for (let r = 0; r < BOARD_SIZE; r++) {
+        for (let c = 0; c < BOARD_SIZE; c++) {
+            if (grid[r][c] !== null) filled++;
+        }
+    }
+    return (filled / total) > 0.75;
+}
+
+function getRandomPieceShape(isCritical = false) {
+    let shapes;
+    if (isCritical) {
+        shapes = [
+            SINGLE_DOT_SHAPE,
+            { matrix: [[1,1]] },
+            { matrix: [[1],[1]] },
+            { matrix: [[1,1],[1,1]] }
+        ];
+    } else {
+        shapes = [...BASE_SHAPES];
+        if (typeof skillSingleActive !== 'undefined' && skillSingleActive) shapes.push(SINGLE_DOT_SHAPE);
+    }
+    const selected = shapes[Math.floor(Math.random() * shapes.length)];
+    const colorList = Object.values(GEM_COLORS);
+    const randomColor = colorList[Math.floor(Math.random() * colorList.length)];
+    return {
+        matrix: selected.matrix.map(row => [...row]),
+        color: randomColor
+    };
+}
+
+function generateThreePieces(currentGrid) {
+    const pieces = [];
+    const maxRerolls = 5;
+
+    for (let i = 0; i < 3; i++) {
+        let candidatePiece = getRandomPieceShape(false);
+        let attempts = 0;
+
+        while (!canPieceFit(currentGrid, candidatePiece.matrix) && attempts < maxRerolls) {
+            if (isGridCritical(currentGrid)) {
+                candidatePiece = getRandomPieceShape(true);
+            } else {
+                candidatePiece = getRandomPieceShape(false);
+            }
+            attempts++;
+        }
+
+        pieces.push(candidatePiece);
+    }
+
+    return pieces;
+}
 
 function getAvailableShapes() {
     let shapes = [...BASE_SHAPES];
-    if (skillSingleActive) shapes.push(SINGLE_DOT_SHAPE);
+    if (typeof skillSingleActive !== 'undefined' && skillSingleActive) shapes.push(SINGLE_DOT_SHAPE);
     return shapes;
 }
 
 function spawnPieces(all = false) {
-    const shapesPool = getAvailableShapes();
     turnHasDragged = false;
 
-    if (all) {
+    if (all || activePieces.length === 0) {
         activePieces = [];
+        const newPieces = generateThreePieces(boardState);
         for (let i = 0; i < 3; i++) {
-            const shape = shapesPool[Math.floor(Math.random() * shapesPool.length)];
+            const shape = newPieces[i];
             createPieceElement(shape, i);
             activePieces.push({ shape, slot: i, rotated: false });
-        }
-    } else {
-        if (activePieces.length === 0) {
-            for (let i = 0; i < 3; i++) {
-                const shape = shapesPool[Math.floor(Math.random() * shapesPool.length)];
-                createPieceElement(shape, i);
-                activePieces.push({ shape, slot: i, rotated: false });
-            }
         }
     }
     updateSkillUI();

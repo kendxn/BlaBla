@@ -277,8 +277,8 @@ main {
 }
 
 #tray {
-    height: 22vh;
-    min-height: 140px;
+    height: 25vh;
+    min-height: 160px;
     display: flex;
     justify-content: space-evenly;
     align-items: center;
@@ -289,10 +289,10 @@ main {
 }
 
 .tray-slot {
-    width: 28vw;
-    height: 28vw;
-    max-width: 120px;
-    max-height: 120px;
+    width: 36vw;
+    height: 36vw;
+    max-width: 156px;
+    max-height: 156px;
     display: flex;
     justify-content: center;
     align-items: center;
@@ -313,12 +313,12 @@ main {
 }
 
 .piece-block {
-    width: 4.5vw;
-    height: 4.5vw;
-    min-width: 22px;
-    min-height: 22px;
-    max-width: 32px;
-    max-height: 32px;
+    width: 5.85vw;
+    height: 5.85vw;
+    min-width: 29px;
+    min-height: 29px;
+    max-width: 42px;
+    max-height: 42px;
     border-radius: 4px;
 }
 
@@ -326,6 +326,45 @@ main {
     position: fixed;
     z-index: 1000;
     pointer-events: none;
+}
+
+#no-space-overlay {
+    position: absolute;
+    top: 25%; left: 0; right: 0; bottom: 25%;
+    background: rgba(15, 15, 25, 0.25);
+    backdrop-filter: blur(2px);
+    -webkit-backdrop-filter: blur(2px);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 100;
+    border-radius: 16px;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.4s ease;
+}
+
+#no-space-overlay.visible {
+    opacity: 1;
+    pointer-events: auto;
+}
+
+.no-space-text {
+    font-family: 'Baloo 2', 'Segoe UI', sans-serif;
+    font-size: 1.8rem;
+    font-weight: 800;
+    color: #ffffff;
+    text-shadow: 0 0 15px rgba(255, 255, 255, 0.9), 0 0 30px rgba(255, 255, 255, 0.6), 0 2px 10px rgba(0, 0, 0, 0.8);
+    text-transform: uppercase;
+    letter-spacing: 2px;
+    text-align: center;
+    padding: 10px 20px;
+    animation: noSpacePop 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards;
+}
+
+@keyframes noSpacePop {
+    0% { transform: scale(0.4); opacity: 0; }
+    100% { transform: scale(1); opacity: 1; }
 }
 
 #game-over {
@@ -381,7 +420,7 @@ main {
     padding: 20px;
 }
 
-.go-score-group {
+.go-score-group {   
     display: flex;
     flex-direction: column;
     align-items: center;

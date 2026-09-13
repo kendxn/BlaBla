@@ -289,8 +289,8 @@
         }
 
         #tray {
-            height: 22vh;
-            min-height: 140px;
+            height: 25vh;
+            min-height: 160px;
             display: flex;
             justify-content: space-evenly;
             align-items: center;
@@ -301,10 +301,10 @@
         }
 
         .tray-slot {
-            width: 28vw;
-            height: 28vw;
-            max-width: 120px;
-            max-height: 120px;
+            width: 36vw;
+            height: 36vw;
+            max-width: 156px;
+            max-height: 156px;
             display: flex;
             justify-content: center;
             align-items: center;
@@ -325,12 +325,12 @@
         }
 
         .piece-block {
-            width: 4.5vw;
-            height: 4.5vw;
-            min-width: 22px;
-            min-height: 22px;
-            max-width: 32px;
-            max-height: 32px;
+            width: 5.85vw;
+            height: 5.85vw;
+            min-width: 29px;
+            min-height: 29px;
+            max-width: 42px;
+            max-height: 42px;
             border-radius: 4px;
         }
 
@@ -338,6 +338,45 @@
             position: fixed;
             z-index: 1000;
             pointer-events: none;
+        }
+
+        #no-space-overlay {
+            position: absolute;
+            top: 25%; left: 0; right: 0; bottom: 25%;
+            background: rgba(15, 15, 25, 0.25);
+            backdrop-filter: blur(2px);
+            -webkit-backdrop-filter: blur(2px);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 100;
+            border-radius: 16px;
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 0.4s ease;
+        }
+
+        #no-space-overlay.visible {
+            opacity: 1;
+            pointer-events: auto;
+        }
+
+        .no-space-text {
+            font-family: 'Baloo 2', 'Segoe UI', sans-serif;
+            font-size: 1.8rem;
+            font-weight: 800;
+            color: #ffffff;
+            text-shadow: 0 0 15px rgba(255, 255, 255, 0.9), 0 0 30px rgba(255, 255, 255, 0.6), 0 2px 10px rgba(0, 0, 0, 0.8);
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            text-align: center;
+            padding: 10px 20px;
+            animation: noSpacePop 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards;
+        }
+
+        @keyframes noSpacePop {
+            0% { transform: scale(0.4); opacity: 0; }
+            100% { transform: scale(1); opacity: 1; }
         }
 
         #game-over {
@@ -751,37 +790,65 @@
         }
 
         const BASE_SHAPES = [
-            // Pezzo O (Giallo / Oro)
-            { matrix: [[1,1],[1,1]], color: GEM_COLORS.yellow },
-            // Pezzi I (Ciano / Azzurro & Turchese Chiaro)
-            { matrix: [[1,1]], color: GEM_COLORS.cyan },
-            { matrix: [[1,1,1]], color: GEM_COLORS.cyan },
-            { matrix: [[1,1,1,1]], color: GEM_COLORS.turquoise },
-            { matrix: [[1],[1]], color: GEM_COLORS.cyan },
-            { matrix: [[1],[1],[1]], color: GEM_COLORS.turquoise },
-            { matrix: [[1],[1],[1],[1]], color: GEM_COLORS.cyan },
-            // Pezzi L (Arancione Intenso & Rosa Magenta)
-            { matrix: [[1,0],[1,1]], color: GEM_COLORS.orange },
-            { matrix: [[0,1],[1,1]], color: GEM_COLORS.magenta },
-            { matrix: [[1,1,1],[1,0,0]], color: GEM_COLORS.orange },
-            { matrix: [[1,1,1],[0,0,1]], color: GEM_COLORS.magenta },
-            // Pezzi J (Blu Elettrico & Viola Scuro / Indaco)
-            { matrix: [[1,1],[1,0]], color: GEM_COLORS.blue },
-            { matrix: [[1,1],[0,1]], color: GEM_COLORS.indigo },
-            { matrix: [[1,0,0],[1,1,1]], color: GEM_COLORS.blue },
-            { matrix: [[0,0,1],[1,1,1]], color: GEM_COLORS.indigo },
-            // Pezzi T (Viola & Verde Acqua / Teal)
-            { matrix: [[1,1,1],[0,1,0]], color: GEM_COLORS.purple },
-            { matrix: [[0,1,0],[1,1,1]], color: GEM_COLORS.teal },
-            { matrix: [[1,0],[1,1],[1,0]], color: GEM_COLORS.purple },
-            { matrix: [[0,1],[1,1],[0,1]], color: GEM_COLORS.teal },
-            // Pezzo S (Verde Lime)
-            { matrix: [[0,1,1],[1,1,0]], color: GEM_COLORS.lime },
-            // Pezzo Z (Rosso / Corallo)
-            { matrix: [[1,1,0],[0,1,1]], color: GEM_COLORS.red }
+            // Pezzo O 2x2
+            { matrix: [[1,1],[1,1]] },
+            // Pezzo O 3x3 Grande
+            { matrix: [
+                [1,1,1],
+                [1,1,1],
+                [1,1,1]
+            ] },
+            // Pezzi I 4x1 Orizzontale & Verticale
+            { matrix: [[1,1,1,1]] },
+            { matrix: [[1],[1],[1],[1]] },
+            // Pezzi I 1x2, 1x3, 2x1, 3x1
+            { matrix: [[1,1]] },
+            { matrix: [[1,1,1]] },
+            { matrix: [[1],[1]] },
+            { matrix: [[1],[1],[1]] },
+            // Pezzi L
+            { matrix: [[1,0],[1,1]] },
+            { matrix: [[0,1],[1,1]] },
+            { matrix: [[1,1,1],[1,0,0]] },
+            { matrix: [[1,1,1],[0,0,1]] },
+            // Pezzi L 3x3 (Grandi: alto 3 e largo 3)
+            { matrix: [
+                [1,0,0],
+                [1,0,0],
+                [1,1,1]
+            ] },
+            { matrix: [
+                [0,0,1],
+                [0,0,1],
+                [1,1,1]
+            ] },
+            { matrix: [
+                [1,1,1],
+                [1,0,0],
+                [1,0,0]
+            ] },
+            { matrix: [
+                [1,1,1],
+                [0,0,1],
+                [0,0,1]
+            ] },
+            // Pezzi J
+            { matrix: [[1,1],[1,0]] },
+            { matrix: [[1,1],[0,1]] },
+            { matrix: [[1,0,0],[1,1,1]] },
+            { matrix: [[0,0,1],[1,1,1]] },
+            // Pezzi T
+            { matrix: [[1,1,1],[0,1,0]] },
+            { matrix: [[0,1,0],[1,1,1]] },
+            { matrix: [[1,0],[1,1],[1,0]] },
+            { matrix: [[0,1],[1,1],[0,1]] },
+            // Pezzo S
+            { matrix: [[0,1,1],[1,1,0]] },
+            // Pezzo Z
+            { matrix: [[1,1,0],[0,1,1]] }
         ];
 
-        const SINGLE_DOT_SHAPE = { matrix: [[1]], color: GEM_COLORS.yellow };
+        const SINGLE_DOT_SHAPE = { matrix: [[1]] };
 
         function resizeCanvas() {
             canvas.width = window.innerWidth;
@@ -922,30 +989,89 @@
             }, 100);
         }
 
+        function canPieceFit(grid, pieceMatrix) {
+            for (let r = 0; r < BOARD_SIZE; r++) {
+                for (let c = 0; c < BOARD_SIZE; c++) {
+                    if (canPlace(pieceMatrix, r, c)) {
+                        return true;
+                    }
+                }
+            }
+            return false;
+        }
+
+        function isGridCritical(grid) {
+            let filled = 0;
+            const total = BOARD_SIZE * BOARD_SIZE;
+            for (let r = 0; r < BOARD_SIZE; r++) {
+                for (let c = 0; c < BOARD_SIZE; c++) {
+                    if (grid[r][c] !== null) filled++;
+                }
+            }
+            return (filled / total) > 0.75;
+        }
+
+        function getRandomPieceShape(isCritical = false) {
+            let shapes;
+            if (isCritical) {
+                shapes = [
+                    SINGLE_DOT_SHAPE,
+                    { matrix: [[1,1]] },
+                    { matrix: [[1],[1]] },
+                    { matrix: [[1,1],[1,1]] }
+                ];
+            } else {
+                shapes = [...BASE_SHAPES];
+                if (typeof skillSingleActive !== 'undefined' && skillSingleActive) shapes.push(SINGLE_DOT_SHAPE);
+            }
+            const selected = shapes[Math.floor(Math.random() * shapes.length)];
+            const colorList = Object.values(GEM_COLORS);
+            const randomColor = colorList[Math.floor(Math.random() * colorList.length)];
+            return {
+                matrix: selected.matrix.map(row => [...row]),
+                color: randomColor
+            };
+        }
+
+        function generateThreePieces(currentGrid) {
+            const pieces = [];
+            const maxRerolls = 5;
+
+            for (let i = 0; i < 3; i++) {
+                let candidatePiece = getRandomPieceShape(false);
+                let attempts = 0;
+
+                while (!canPieceFit(currentGrid, candidatePiece.matrix) && attempts < maxRerolls) {
+                    if (isGridCritical(currentGrid)) {
+                        candidatePiece = getRandomPieceShape(true);
+                    } else {
+                        candidatePiece = getRandomPieceShape(false);
+                    }
+                    attempts++;
+                }
+
+                pieces.push(candidatePiece);
+            }
+
+            return pieces;
+        }
+
         function getAvailableShapes() {
             let shapes = [...BASE_SHAPES];
-            if (skillSingleActive) shapes.push(SINGLE_DOT_SHAPE);
+            if (typeof skillSingleActive !== 'undefined' && skillSingleActive) shapes.push(SINGLE_DOT_SHAPE);
             return shapes;
         }
 
         function spawnPieces(all = false) {
-            const shapesPool = getAvailableShapes();
             turnHasDragged = false;
 
-            if (all) {
+            if (all || activePieces.length === 0) {
                 activePieces = [];
+                const newPieces = generateThreePieces(boardState);
                 for (let i = 0; i < 3; i++) {
-                    const shape = shapesPool[Math.floor(Math.random() * shapesPool.length)];
+                    const shape = newPieces[i];
                     createPieceElement(shape, i);
                     activePieces.push({ shape, slot: i, rotated: false });
-                }
-            } else {
-                if (activePieces.length === 0) {
-                    for (let i = 0; i < 3; i++) {
-                        const shape = shapesPool[Math.floor(Math.random() * shapesPool.length)];
-                        createPieceElement(shape, i);
-                        activePieces.push({ shape, slot: i, rotated: false });
-                    }
                 }
             }
             updateSkillUI();
@@ -1154,8 +1280,7 @@
                     }
 
                     if (skillDiscardActive && !turnHasDragged && !isDoubleTap) {
-                        const shapesPool = getAvailableShapes();
-                        const newShape = shapesPool[Math.floor(Math.random() * shapesPool.length)];
+                        const newShape = getRandomPieceShape();
                         if (pieceData) {
                             pieceData.shape = newShape;
                             pieceData.rotated = false;
@@ -1767,68 +1892,104 @@ function triggerRainbowSweep(clearedRows, clearedCols) {
             }
         }
 
+        let gameOverCheckTimeout = null;
+
+        function getOrCreateNoSpaceOverlay() {
+            let overlay = document.getElementById('no-space-overlay');
+            const trayElement = document.getElementById('tray');
+            if (!overlay && trayElement) {
+                overlay = document.createElement('div');
+                overlay.id = 'no-space-overlay';
+                overlay.innerHTML = '<div class="no-space-text">No space left</div>';
+                trayElement.appendChild(overlay);
+            } else if (overlay && overlay.parentElement !== trayElement && trayElement) {
+                trayElement.appendChild(overlay);
+            }
+            return overlay;
+        }
+
         function checkGameOver() {
-            if (activePieces.length === 0) return;
-            let canPlay = false;
-            for (const piece of activePieces) {
-                for (let r = 0; r < BOARD_SIZE; r++) {
-                    for (let c = 0; c < BOARD_SIZE; c++) {
-                        if (canPlace(piece.shape.matrix, r, c)) {
-                            canPlay = true;
-                            break;
+            if (gameOverCheckTimeout) clearTimeout(gameOverCheckTimeout);
+
+            gameOverCheckTimeout = setTimeout(() => {
+                gameOverCheckTimeout = null;
+                if (activePieces.length === 0 || gameOver) return;
+
+                let canPlay = false;
+                for (const piece of activePieces) {
+                    for (let r = 0; r < BOARD_SIZE; r++) {
+                        for (let c = 0; c < BOARD_SIZE; c++) {
+                            if (canPlace(piece.shape.matrix, r, c)) {
+                                canPlay = true;
+                                break;
+                            }
                         }
+                        if (canPlay) break;
                     }
                     if (canPlay) break;
                 }
-                if (canPlay) break;
-            }
 
-            if (!canPlay && !gameOver) {
-                gameOver = true;
-                triggerGameOver();
-            }
-        }
-        function triggerGameOver() {
-            let delay = 0;
-            for (let r = 0; r < BOARD_SIZE; r++) {
-                for (let c = 0; c < BOARD_SIZE; c++) {
-                    if (boardState[r][c]) {
-                        setTimeout(() => {
-                            const cell = boardElement.children[r * BOARD_SIZE + c];
-                            const randomColor = COLORS[Math.floor(Math.random() * COLORS.length)];
-                            cell.innerHTML = createGemBlockHTML(randomColor);
-                        }, delay);
-                        delay += 15;
-                    }
+                if (!canPlay && !gameOver) {
+                    gameOver = true;
+                    triggerGameOver();
                 }
+            }, 500);
+        }
+
+        function triggerGameOver() {
+            const overlay = getOrCreateNoSpaceOverlay();
+            if (overlay) {
+                overlay.classList.add('visible');
             }
 
             setTimeout(() => {
-                const goScoreText = document.getElementById('go-score-text');
-                if(goScoreText) animateNumberValue(goScoreText, 0, score, 800);
-
-                const isNewRecord = achievedNewRecord || (score > sessionStartHighScore);
-
-                if (isNewRecord) {
-                    const prevHigh = highScore;
-                    highScore = Math.max(highScore, score);
-                    localStorage.setItem('blockBlast3DHighScore8x8', highScore);
-                    if(highScoreElement) animateNumberValue(highScoreElement, prevHigh, highScore, 400);
-                    if(gameOverScreen) gameOverScreen.classList.add('new-high-score');
-                    setTimeout(() => {
-                        if(typeof shootConfetti === 'function') shootConfetti();
-                        else if(typeof spawnConfetti === 'function') spawnConfetti();
-                    }, 100);
-                } else {
-                    if(gameOverScreen) gameOverScreen.classList.remove('new-high-score');
+                let delay = 0;
+                for (let r = 0; r < BOARD_SIZE; r++) {
+                    for (let c = 0; c < BOARD_SIZE; c++) {
+                        if (boardState[r][c]) {
+                            setTimeout(() => {
+                                const cell = boardElement.children[r * BOARD_SIZE + c];
+                                if (cell) {
+                                    const randomColor = COLORS[Math.floor(Math.random() * COLORS.length)];
+                                    cell.innerHTML = createGemBlockHTML(randomColor);
+                                }
+                            }, delay);
+                            delay += 15;
+                        }
+                    }
                 }
-                
-                if(gameOverScreen) {
-                    gameOverScreen.classList.remove('visible');
-                    void gameOverScreen.offsetWidth;
-                    gameOverScreen.classList.add('visible');
-                }
-            }, delay + 500);
+
+                setTimeout(() => {
+                    if (overlay) {
+                        overlay.classList.remove('visible');
+                    }
+
+                    const goScoreText = document.getElementById('go-score-text');
+                    if(goScoreText) animateNumberValue(goScoreText, 0, score, 800);
+
+                    const isNewRecord = achievedNewRecord || (score > sessionStartHighScore);
+
+                    if (isNewRecord) {
+                        const prevHigh = highScore;
+                        highScore = Math.max(highScore, score);
+                        localStorage.setItem('blockBlast3DHighScore8x8', highScore);
+                        if(highScoreElement) animateNumberValue(highScoreElement, prevHigh, highScore, 400);
+                        if(gameOverScreen) gameOverScreen.classList.add('new-high-score');
+                        setTimeout(() => {
+                            if(typeof shootConfetti === 'function') shootConfetti();
+                            else if(typeof spawnConfetti === 'function') spawnConfetti();
+                        }, 100);
+                    } else {
+                        if(gameOverScreen) gameOverScreen.classList.remove('new-high-score');
+                    }
+                    
+                    if(gameOverScreen) {
+                        gameOverScreen.classList.remove('visible');
+                        void gameOverScreen.offsetWidth;
+                        gameOverScreen.classList.add('visible');
+                    }
+                }, delay + 500);
+            }, 1000);
         }
 
         playBtn.addEventListener('click', () => {
