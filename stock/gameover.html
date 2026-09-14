@@ -7,16 +7,17 @@
     <title>Game Over Screen Animato</title>
     
     <style>
-        /* Importazione del font 'Baloo 2' da Google Fonts per uno stile casual/giovanile */
-        @import url('https://fonts.googleapis.com/css2?family=Baloo+2:wght@400;600;800&display=swap');
+        /* Importazione dei font Pixel Art da Google Fonts */
+        @import url('https://fonts.googleapis.com/css2?family=Press+Start+2P&family=Silkscreen:wght@400;700&display=swap');
 
         /* Reset CSS: azzera margini, padding e imposta il box-sizing per evitare problemi di calcolo delle dimensioni */
         * {
             margin: 0;
             padding: 0;
             box-sizing: border-box;
-            font-family: 'Baloo 2', sans-serif;
+            font-family: 'Press Start 2P', monospace;
             user-select: none; /* Impedisce all'utente di selezionare il testo per errore */
+            image-rendering: pixelated;
         }
 
         /* Stile del corpo della pagina: occupa tutta l'altezza dello schermo e centra i contenuti */
@@ -26,7 +27,7 @@
             flex-direction: column;
             justify-content: center; /* Centra verticalmente il contenuto */
             align-items: center;    /* Centra orizzontalmente il contenuto */
-            background: linear-gradient(180deg, #7b2cbf 0%, #38006b 100%); /* Sfondo viola con gradiente lineare */
+            background: radial-gradient(circle at 50% 50%, #581c87 0%, #2e1065 100%);
             overflow: hidden; /* Nasconde le barre di scorrimento */
             position: relative; /* Posizionamento relativo per ancorare il canvas dei coriandoli allo sfondo */
         }
@@ -60,15 +61,16 @@
             display: flex;
             flex-direction: column;
             align-items: center;
-            margin-bottom: 60px; /* Distanza tra il gruppo dei punteggi e il pulsante Play in basso */
+            margin-bottom: 45px; /* Distanza tra il gruppo dei punteggi e il pulsante Play in basso */
         }
 
         /* Immagine della corona */
         .crown {
-            width: 130px;
-            margin-bottom: 15px; /* Spazio sotto la corona */
-            filter: drop-shadow(0 6px 8px rgba(0,0,0,0.4)); /* Aggiunge un'ombra morbida per dare profondità 3D all'immagine PNG */
+            width: 110px;
+            margin-bottom: 20px; /* Spazio sotto la corona */
+            filter: drop-shadow(4px 4px 0px #000000);
             object-fit: contain;
+            image-rendering: pixelated;
             
             /* --- Setup iniziale per l'animazione di entrata --- */
             opacity: 0; /* Inizialmente invisibile */
@@ -77,15 +79,16 @@
             animation-delay: 0.1s; /* Ritardo di 0.1 secondi per far apparire prima la corona */
         }
 
-        /* Testo "Best Score!" (Arancione) */
+        /* Testo "Best Score!" (Giallo Pixel) */
         .best-score-text {
-            color: #ff9b3d;
-            font-size: 54px; /* <-- DIMENSIONE AUMENTATA DA 38px A 54px */
-            font-weight: 800;
-            text-transform: uppercase; /* Forza il testo in maiuscolo */
-            text-shadow: 0 4px 0 rgba(0,0,0,0.2); /* Ombra netta sotto il testo */
-            margin-bottom: 45px; /* Spazio ampio prima della parola 'Score' */
-            letter-spacing: 1px;
+            color: #ffd700;
+            font-size: clamp(18px, 5vw, 32px);
+            font-weight: bold;
+            text-transform: uppercase;
+            text-shadow: 3px 3px 0px #c79500, 6px 6px 0px #000000;
+            margin-bottom: 35px;
+            letter-spacing: 2px;
+            text-align: center;
             
             /* Animazione di entrata */
             opacity: 0;
@@ -94,13 +97,14 @@
             animation-delay: 0.25s; /* Appare dopo la corona */
         }
 
-        /* Testo "Score" (Viola chiaro) */
+        /* Testo "Score" (Viola chiaro Pixel) */
         .score-label {
             color: #d8b4fe;
-            font-size: 28px;
-            font-weight: 600;
+            font-size: clamp(11px, 3.2vw, 16px);
+            font-weight: bold;
             text-transform: uppercase;
-            text-shadow: 0 2px 0 rgba(0,0,0,0.2);
+            text-shadow: 2px 2px 0px #000000;
+            margin-bottom: 12px;
             
             /* Animazione di entrata */
             opacity: 0;
@@ -109,13 +113,13 @@
             animation-delay: 0.4s; /* Appare dopo 'Best Score' */
         }
 
-        /* Numero del punteggio "864" (Bianco) */
+        /* Numero del punteggio "864" (Bianco Pixel) */
         .score-number {
             color: #ffffff;
-            font-size: 88px;
-            font-weight: 800;
-            line-height: 0.9; /* Abbassa l'altezza della riga per accorciare lo spazio con 'Score' sopra */
-            text-shadow: 0 5px 0 rgba(0,0,0,0.25);
+            font-size: clamp(34px, 9vw, 58px);
+            font-weight: bold;
+            line-height: 1;
+            text-shadow: 4px 4px 0px #000000;
             
             /* Animazione di entrata */
             opacity: 0;
@@ -124,25 +128,33 @@
             animation-delay: 0.5s; /* Appare per ultimo */
         }
 
-        /* Pulsante Play verde in fondo */
+        /* Pulsante Play verde Pixel Art */
         .play-button {
-            background-color: #38d977;
-            width: 80px;
-            height: 80px;
-            border-radius: 50%; /* Rende il bottone perfettamente circolare */
-            border: none;
-            cursor: pointer; /* Cambia il cursore del mouse nella manina quando sopra il bottone */
+            background-color: #2ecc71;
+            width: 86px;
+            height: 86px;
+            border-radius: 0px;
+            border: 4px solid #000000;
+            cursor: pointer;
             display: flex;
             justify-content: center;
             align-items: center;
-            box-shadow: 0 6px 0 #1e9b57, 0 10px 15px rgba(0,0,0,0.3); /* Ombra doppia: una scura sotto per l'effetto 3D, una sfumata per la profondità */
-            transition: transform 0.1s ease, box-shadow 0.1s ease; /* Transizione fluida per l'effetto pressione */
-            
-            /* Animazione di entrata */
+            box-shadow: 
+                inset 4px 4px 0px #abebc6, 
+                inset -4px -4px 0px #1e9b57, 
+                6px 6px 0px #000000;
+            transition: transform 0.1s ease, box-shadow 0.1s ease;
             opacity: 0;
             transform: scale(0.5) translateY(20px);
-            animation: popIn 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards;
-            animation-delay: 0.65s; /* Appare per ultimo, sotto a tutto */
+            animation: popIn 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards 0.65s;
+        }
+
+        .play-button:active {
+            transform: translate(3px, 3px);
+            box-shadow: 
+                inset 4px 4px 0px #abebc6, 
+                inset -4px -4px 0px #1e9b57, 
+                3px 3px 0px #000000;
         }
 
         /* Effetto quando si clicca e tiene premuto il bottone (viene spinto verso il basso) */

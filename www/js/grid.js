@@ -1,9 +1,9 @@
 const BOARD_SIZE = 8;
 const boardElement = document.getElementById('board');
-const scoreElement = document.getElementById('score');
-const highScoreElement = document.getElementById('high-score');
+const scoreElement = document.getElementById('currentScoreDisplay') || document.getElementById('score');
+const highScoreElement = document.getElementById('maxScoreDisplay') || document.getElementById('high-score');
 const skillStatus = document.getElementById('skill-status');
-const linesText = document.getElementById('lines-text');
+const linesText = document.getElementById('linesClearedText') || document.getElementById('lines-text');
 const gameOverScreen = document.getElementById('game-over');
 const playBtn = document.getElementById('play-btn');
 const canvas = document.getElementById('confetti-canvas');
@@ -981,6 +981,26 @@ function animateBouncer() {
 document.addEventListener('DOMContentLoaded', () => {
     initBouncer();
     animateBouncer();
+
+    const btnSettings = document.getElementById('btnSettings');
+    const btnSkills = document.getElementById('btnSkills');
+    const btnShop = document.getElementById('btnShop');
+
+    if (btnSettings) {
+        btnSettings.addEventListener('click', () => {
+            console.log('Impostazioni aperte');
+        });
+    }
+    if (btnSkills) {
+        btnSkills.addEventListener('click', () => {
+            console.log('Abilità aperte');
+        });
+    }
+    if (btnShop) {
+        btnShop.addEventListener('click', () => {
+            console.log('Negozio aperto');
+        });
+    }
 });
 
 window.addEventListener('resize', () => {

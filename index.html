@@ -4,6 +4,9 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>Block Blast 3D</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&family=Silkscreen:wght@400;700&display=swap" rel="stylesheet">
     <style>
         :root {
             --bg-color: #3F588F;
@@ -24,153 +27,339 @@
             touch-action: none;
             user-select: none;
             -webkit-user-select: none;
-            font-family: Arial, Helvetica, sans-serif;
+            font-family: 'Press Start 2P', 'Silkscreen', monospace, sans-serif;
+            image-rendering: pixelated;
+            image-rendering: crisp-edges;
+        }
+
+        @font-face {
+            font-family: 'PressStart2P';
+            src: url('assets/press-start-2p-font/PressStart2P-vaV7.ttf') format('truetype');
+            font-weight: normal;
+            font-style: normal;
         }
 
         body {
-            background: linear-gradient(to bottom, var(--bg-top), var(--bg-bottom));
+            background-image: url('assets/Gemini_Generated_Image_fcv39gfcv39gfcv3.jpg');
+            background-size: cover;
+            background-position: center;
+            background-attachment: fixed;
             color: var(--text-color);
             display: flex;
             flex-direction: column;
+            align-items: center;
             height: 100vh;
             height: 100dvh;
             overflow: hidden;
+            font-family: 'PressStart2P', 'Press Start 2P', monospace, sans-serif;
         }
 
-        /* Testo 3D per schermata Game Over */
+        /* Testo Pixel Art per schermata Game Over e Titoli */
         .text-3d {
-            font-weight: 900;
+            font-weight: bold;
+            font-family: 'PressStart2P', 'Press Start 2P', monospace;
             text-shadow: 
-                0 1px 0 #cccccc, 
-                0 2px 0 #bbbbbb, 
-                0 3px 0 #aaaaaa, 
-                0 4px 0 #999999, 
-                0 5px 0 #888888, 
-                0 6px 0 #777777, 
-                0 7px 4px rgba(0,0,0,0.6),
-                0 10px 10px rgba(0,0,0,0.4);
+                3px 3px 0px #000000, 
+                6px 6px 0px rgba(0,0,0,0.5);
         }
 
         /* 
            =========================================================
-           NUOVO DESIGN HEADER (PUNTEGGI E SKILL)
+           DESIGN HEADER NEGOZIO (TOP BAR, LINES CLEARED & BUTTONS)
            =========================================================
         */
-        .header-container {
-            width: 100%;
+        .game-container {
+            position: relative;
+            width: 100vw;
+            height: 25vh;
+            margin-top: 1vh;
+            border: none;
+            box-shadow: none;
+            flex-shrink: 0;
+        }
+
+        .top-bar {
+            position: absolute;
+            top: 5%;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 90%;
             max-width: 450px;
+            height: 18%;
+            z-index: 10;
+        }
+
+        .top-bar-bg {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            object-fit: fill;
+            filter: 
+                drop-shadow(-8px 0 12px rgba(0,0,0,0.45))
+                drop-shadow(8px 0 12px rgba(0,0,0,0.45))
+                drop-shadow(0 4px 8px rgba(0,0,0,0.35));
+        }
+
+        .top-bar-content {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0 2% 0 1%;
+            z-index: 11;
+        }
+
+        .icon-crown {
+            height: 85%;
+            width: auto;
+            object-fit: contain;
+            filter: drop-shadow(2px 2px 3px rgba(0,0,0,0.4));
+            animation: crownBounce 2s ease-in-out infinite;
+        }
+
+        @keyframes crownBounce {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-3px); }
+        }
+
+        .max-score-text {
+            display: flex;
+            align-items: center;
+            gap: 1.5vw;
+            margin-left: 2vw;
+            margin-right: auto;
+            font-family: 'PressStart2P', 'Press Start 2P', monospace;
+            font-size: clamp(14px, 3.7vw, 24px);
+            color: #4a3520;
+            text-shadow: 2px 2px 0 rgba(255,255,255,0.3);
+            letter-spacing: 1px;
+        }
+
+        .max-score-text .score-value {
+            display: flex;
+            align-items: center;
+            gap: 0.2vw;
+        }
+
+        .icon-settings {
+            height: 70%;
+            width: auto;
+            object-fit: contain;
+            filter: drop-shadow(2px 2px 3px rgba(0,0,0,0.4));
+            cursor: pointer;
+            transition: transform 0.3s ease;
+        }
+
+        .icon-settings:hover {
+            transform: rotate(45deg);
+        }
+
+        /* ===== LINES CLEARED SECTION ===== */
+        .lines-section {
+            position: absolute;
+            top: 28%;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 90%;
+            max-width: 450px;
+            z-index: 10;
             display: flex;
             flex-direction: column;
             align-items: center;
-            gap: 12px;
-            padding: 2vh 5vw 1vh;
-            margin: 0 auto;
+            gap: 1vh;
         }
 
-        .level-1 {
-            width: 100%;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-        }
-
-        .max-score-wrapper {
-            display: flex;
-            align-items: center;
-            gap: 8px;
-        }
-
-        .crown-icon {
-            width: 32px;
-            height: 32px;
-            color: #f1c40f;
-            filter: drop-shadow(0 2px 2px rgba(0,0,0,0.8)) drop-shadow(0 -1px 0 rgba(255,255,255,0.2));
-        }
-
-        .max-score-value {
-            font-size: 24px;
-            font-weight: bold;
-            color: #f1c40f;
-            line-height: 1;
-            font-variant-numeric: tabular-nums;
-            text-shadow: 
-                1px 1px 0 #c79500, 
-                2px 2px 0 #c79500, 
-                3px 3px 4px rgba(0,0,0,0.6);
-        }
-
-        .settings-wrapper {
-            cursor: pointer;
-        }
-
-        .gear-icon {
-            width: 37px;
-            height: 37px;
-            color: #ccc;
-            filter: drop-shadow(0 2px 2px rgba(0,0,0,0.8)) drop-shadow(0 -1px 0 rgba(255,255,255,0.2));
-        }
-
-        .level-2 {
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 12px;
-            transform: translateY(15%);
-        }
-
-        .lines-bar {
-            display: flex;
-            justify-content: center;
-            gap: 8px;
-        }
-
-        .dot {
-            width: 12px;
-            height: 12px;
-            border-radius: 50%;
-            background-color: #333;
-            box-shadow: inset 0 2px 3px rgba(0,0,0,0.8);
-            transition: all 0.3s ease;
-        }
-
-        .dot.filled {
-            background-color: #e74c3c;
-            box-shadow: 
-                0 2px 4px rgba(0,0,0,0.6), 
-                inset 0 1px 1px rgba(255,255,255,0.4);
-        }
-
-        .lines-text {
-            font-size: 16px;
-            font-weight: bold;
-            color: #ccc;
-            text-shadow: 1px 1px 2px rgba(0,0,0,0.8);
-        }
-
-        .current-score {
-            font-size: 68px;
-            font-weight: bold;
+        .lines-label {
+            font-family: 'PressStart2P', 'Press Start 2P', monospace;
+            font-size: clamp(11px, 3.2vw, 20px);
             color: #ffffff;
-            line-height: 1;
-            text-align: center;
-            font-variant-numeric: tabular-nums;
             text-shadow: 
-                1px 1px 0 #777,
-                2px 2px 0 #666,
-                3px 3px 0 #555,
-                4px 4px 6px rgba(0,0,0,0.7);
-            margin-bottom: 5px;
-            transform: translateY(20%);
+                3px 3px 0 #000000,
+                -3px -3px 0 #000000,
+                3px -3px 0 #000000,
+                -3px 3px 0 #000000,
+                0 4px 0 #000000,
+                4px 0 0 #000000;
+            letter-spacing: 1px;
+            background: none;
+            border: none;
+            padding: 0;
+        }
+
+        .lines-blocks {
+            display: flex;
+            align-items: center;
+            gap: 1vw;
+        }
+
+        .lines-blocks .block {
+            height: clamp(26px, 7vw, 50px);
+            width: clamp(26px, 7vw, 50px);
+            object-fit: contain;
+            image-rendering: pixelated;
+            filter: drop-shadow(3px 4px 5px rgba(0,0,0,0.6));
+            transition: transform 0.2s ease;
+        }
+
+        .lines-blocks .block.green {
+            animation: blockWaveSweep 2.5s ease-in-out infinite;
+        }
+
+        .lines-blocks .block.green:nth-child(1) { animation-delay: 0s; }
+        .lines-blocks .block.green:nth-child(2) { animation-delay: 0.42s; }
+        .lines-blocks .block.green:nth-child(3) { animation-delay: 0.84s; }
+        .lines-blocks .block.green:nth-child(4) { animation-delay: 1.26s; }
+        .lines-blocks .block.green:nth-child(5) { animation-delay: 1.68s; }
+        .lines-blocks .block.green:nth-child(6) { animation-delay: 2.1s; }
+
+        @keyframes blockWaveSweep {
+            0% { transform: scale(1); filter: drop-shadow(3px 4px 5px rgba(0,0,0,0.6)) brightness(1); }
+            12% { transform: scale(1.05); filter: drop-shadow(0 0 10px rgba(80,255,120,0.9)) brightness(1.35); }
+            25%, 100% { transform: scale(1); filter: drop-shadow(3px 4px 5px rgba(0,0,0,0.6)) brightness(1); }
+        }
+
+        .coins-icon {
+            height: clamp(30px, 8vw, 55px);
+            width: auto;
+            object-fit: contain;
+            image-rendering: pixelated;
+            filter: drop-shadow(3px 4px 5px rgba(0,0,0,0.6));
+            animation: coinsSpin 3s ease-in-out infinite;
+        }
+
+        .coin-container {
+            position: relative;
+            display: flex;
+            align-items: center;
+            margin-left: 1vw;
+        }
+
+        .coin-plus-one {
+            position: absolute;
+            top: -10px;
+            right: -15px;
+            color: #ffea00;
+            font-size: clamp(14px, 4vw, 24px);
+            font-family: 'PressStart2P', 'Press Start 2P', monospace;
+            text-shadow: 2px 2px 0 #000, -2px -2px 0 #000, 2px -2px 0 #000, -2px 2px 0 #000;
+            opacity: 0;
+            pointer-events: none;
+        }
+
+        .coin-plus-one.show {
+            animation: floatUpFade 1s ease-out forwards;
+        }
+
+        @keyframes floatUpFade {
+            0% { opacity: 0; transform: translateY(10px) scale(0.5); }
+            20% { opacity: 1; transform: translateY(0) scale(1.2); }
+            80% { opacity: 1; transform: translateY(-15px) scale(1); }
+            100% { opacity: 0; transform: translateY(-25px) scale(1); }
+        }
+
+        @keyframes coinsSpin {
+            0%, 100% { transform: rotate(0deg) scale(1); }
+            25% { transform: rotate(-5deg) scale(1.05); }
+            75% { transform: rotate(5deg) scale(1.05); }
+        }
+
+        /* ===== BOTTOM SECTION (Buttons + Score Centered) ===== */
+        .bottom-section {
+            position: absolute;
+            bottom: 0;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 90%;
+            max-width: 450px;
+            height: 35%;
+            z-index: 5;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .btn-skills,
+        .btn-shop {
+            height: 107%;
+            width: auto;
+            max-width: 38%;
+            object-fit: contain;
+            image-rendering: pixelated;
+            filter: drop-shadow(3px 4px 6px rgba(0,0,0,0.5));
+            cursor: pointer;
+            transition: transform 0.2s ease, filter 0.2s ease;
+        }
+
+        .btn-skills:hover,
+        .btn-shop:hover {
+            transform: scale(1.08);
+            filter: drop-shadow(3px 4px 10px rgba(255,200,100,0.5));
+        }
+
+        .btn-skills:active,
+        .btn-shop:active {
+            transform: scale(0.95);
+        }
+
+        /* ===== CURRENT SCORE AREA ===== */
+        .current-score-area {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            flex: 1;
+            text-align: center;
+            z-index: 10;
+        }
+
+        .current-score-label {
+            font-family: 'PressStart2P', 'Press Start 2P', monospace;
+            font-size: clamp(8px, 2.2vw, 15px);
+            color: #e8c88a;
+            text-shadow: 
+                2px 2px 0 #2a1a0a,
+                -1px -1px 0 #2a1a0a,
+                1px -1px 0 #2a1a0a,
+                -1px 1px 0 #2a1a0a;
+            letter-spacing: 1px;
+            font-weight: bold;
+            margin-bottom: 0.5vh;
+            transform: translateY(1vh);
+        }
+
+        .current-score-digits {
+            font-family: 'PressStart2P', 'Press Start 2P', monospace;
+            font-size: clamp(47px, 11.4vw, 88px); 
+            color: #ffffff;
+            text-shadow: 
+                3px 3px 0 #000000,
+                -3px -3px 0 #000000,
+                3px -3px 0 #000000,
+                -3px 3px 0 #000000,
+                0 3px 0 #000000,
+                3px 0 0 #000000,
+                0 -3px 0 #000000,
+                -3px 0 0 #000000;
+            line-height: 1;
+            margin-top: 3vh;
         }
 
         .skill-status {
-            font-size: 0.9rem;
+            font-family: 'PressStart2P', 'Press Start 2P', monospace;
+            font-size: 10px;
             color: #ffd700;
             min-height: 1.2rem;
             font-weight: bold;
-            text-shadow: 0 2px 4px rgba(0,0,0,0.8);
+            text-shadow: 2px 2px 0px #000000;
             letter-spacing: 1px;
             animation: pulse 1.5s infinite alternate;
+            margin-top: 2px;
         }
 
         @keyframes pulse {
@@ -184,31 +373,45 @@
             justify-content: center;
             align-items: center;
             padding: 5px 10px;
-            transform: translateY(-5%);
+            margin-top: -10vh;
+            position: relative;
+            z-index: 10;
         }
 
         #board {
             display: grid;
             grid-template-columns: repeat(8, 1fr);
             grid-template-rows: repeat(8, 1fr);
-            gap: var(--grid-gap);
-            background-color: var(--grid-line);
-            padding: 5px;
-            border-radius: 8px;
-            width: 100%;
+            gap: 1px;
+            background-color: rgba(26, 40, 62, 0.94);
+            padding: 4px;
+            border-radius: 10px;
+            width: 95vw;
             max-width: 385px;
             aspect-ratio: 1 / 1;
-            border: 1px solid rgba(0, 0, 0, 0.3);
+            border-top: 1.5px solid rgba(255, 255, 255, 0.25);
+            border-left: 1.5px solid rgba(255, 255, 255, 0.25);
+            border-right: 1.5px solid rgba(0, 0, 0, 0.7);
+            border-bottom: 1.5px solid rgba(0, 0, 0, 0.7);
             box-shadow: 
-                inset 8px 8px 15px rgba(0, 0, 0, 0.6),
-                inset -8px -8px 15px rgba(255, 255, 255, 0.2);
+                inset 3px 3px 6px rgba(255, 255, 255, 0.08),
+                inset -3px -3px 6px rgba(0, 0, 0, 0.9),
+                0 10px 25px rgba(0, 0, 0, 0.85);
+            backdrop-filter: blur(8px);
             position: relative;
+            z-index: 10;
         }
 
         .cell {
-            background-color: var(--cell-empty);
+            background-color: rgba(38, 56, 84, 0.9);
             border-radius: 3px;
-            box-shadow: inset 0 0 0 1px var(--grid-line);
+            border-top: 1px solid rgba(0, 0, 0, 0.5);
+            border-left: 1px solid rgba(0, 0, 0, 0.5);
+            border-right: 1px solid rgba(255, 255, 255, 0.08);
+            border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+            box-shadow: 
+                inset 1px 1px 3px rgba(0, 0, 0, 0.7),
+                inset -1px -1px 2px rgba(255, 255, 255, 0.05);
             transition: background-color 0.1s, transform 0.1s;
             overflow: hidden;
         }
@@ -272,7 +475,6 @@
             pointer-events: none;
         }
 
-
         .cell.preview {
             background-color: rgba(255, 255, 255, 0.25) !important;
             box-shadow: inset 0 0 10px rgba(255,255,255,0.5) !important;
@@ -289,26 +491,34 @@
         }
 
         #tray {
-            height: 25vh;
-            min-height: 160px;
+            height: 20vh;
+            min-height: 140px;
             display: flex;
-            justify-content: space-evenly;
+            justify-content: center;
             align-items: center;
-            padding: 10px;
-            transform: translateY(-42%);
+            gap: 8px;
+            max-width: 380px;
+            margin: -16vh auto 0;
+            padding: 5px 10px;
             position: relative;
             z-index: 50;
+            touch-action: none;
+            user-select: none;
+            -webkit-user-select: none;
         }
 
         .tray-slot {
-            width: 36vw;
-            height: 36vw;
-            max-width: 156px;
-            max-height: 156px;
+            width: 30.6vw;
+            height: 30.6vw;
+            max-width: 132px;
+            max-height: 132px;
             display: flex;
             justify-content: center;
             align-items: center;
             position: relative;
+            touch-action: none;
+            user-select: none;
+            -webkit-user-select: none;
         }
 
         .piece {
@@ -317,6 +527,9 @@
             gap: var(--grid-gap);
             position: relative;
             z-index: 10;
+            touch-action: none;
+            user-select: none;
+            -webkit-user-select: none;
         }
 
         .piece-row {
@@ -325,25 +538,31 @@
         }
 
         .piece-block {
-            width: 5.85vw;
-            height: 5.85vw;
-            min-width: 29px;
-            min-height: 29px;
-            max-width: 42px;
-            max-height: 42px;
+            width: 4.68vw;
+            height: 4.68vw;
+            min-width: 23px;
+            min-height: 23px;
+            max-width: 34px;
+            max-height: 34px;
             border-radius: 4px;
+            touch-action: none;
+            user-select: none;
+            -webkit-user-select: none;
         }
 
         .piece.dragging {
             position: fixed;
             z-index: 1000;
-            pointer-events: none;
+            cursor: grabbing;
+            touch-action: none;
+            user-select: none;
+            -webkit-user-select: none;
         }
 
         #no-space-overlay {
             position: absolute;
             top: 25%; left: 0; right: 0; bottom: 25%;
-            background: rgba(15, 15, 25, 0.25);
+            background: rgba(15, 15, 25, 0.45);
             backdrop-filter: blur(2px);
             -webkit-backdrop-filter: blur(2px);
             display: flex;
@@ -362,15 +581,15 @@
         }
 
         .no-space-text {
-            font-family: 'Baloo 2', 'Segoe UI', sans-serif;
-            font-size: 1.8rem;
-            font-weight: 800;
+            font-family: 'Press Start 2P', monospace;
+            font-size: clamp(13px, 3.8vw, 19px);
+            font-weight: bold;
             color: #ffffff;
-            text-shadow: 0 0 15px rgba(255, 255, 255, 0.9), 0 0 30px rgba(255, 255, 255, 0.6), 0 2px 10px rgba(0, 0, 0, 0.8);
+            text-shadow: 3px 3px 0px #ff3344, 6px 6px 0px #000000;
             text-transform: uppercase;
             letter-spacing: 2px;
             text-align: center;
-            padding: 10px 20px;
+            padding: 8px 16px;
             animation: noSpacePop 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards;
         }
 
@@ -386,7 +605,7 @@
             height: 100vh;
             height: 100dvh;
             background-color: var(--bg-color);
-            font-family: 'Baloo 2', 'Segoe UI', sans-serif;
+            font-family: 'Press Start 2P', monospace;
             display: none;
             justify-content: center;
             align-items: center;
@@ -397,7 +616,7 @@
         }
 
         #game-over.new-high-score {
-            background: linear-gradient(180deg, #7b2cbf 0%, #38006b 100%);
+            background-color: #38006b;
         }
 
         #bouncer {
@@ -407,7 +626,7 @@
             display: none;
             transform: rotate(45deg);
             will-change: transform;
-            filter: drop-shadow(0 8px 12px rgba(0,0,0,0.4));
+            filter: drop-shadow(4px 4px 0px #000000);
             z-index: 1;
             pointer-events: none;
         }
@@ -436,17 +655,18 @@
             display: flex;
             flex-direction: column;
             align-items: center;
-            margin-bottom: 60px;
+            margin-bottom: 45px;
         }
 
         .go-crown {
-            width: 130px;
-            margin-bottom: 15px;
-            filter: drop-shadow(0 6px 8px rgba(0,0,0,0.4));
+            width: 110px;
+            margin-bottom: 20px;
+            filter: drop-shadow(4px 4px 0px #000000);
             object-fit: contain;
             opacity: 0;
             transform: scale(0.5);
             display: none;
+            image-rendering: pixelated;
         }
 
         #game-over.new-high-score .go-crown {
@@ -454,13 +674,15 @@
         }
 
         .go-best-score-title {
-            color: #ff9b3d;
-            font-size: clamp(38px, 10vw, 54px);
-            font-weight: 800;
+            font-family: 'Press Start 2P', monospace;
+            color: #ffd700;
+            font-size: clamp(16px, 4.8vw, 30px);
+            font-weight: bold;
             text-transform: uppercase;
-            text-shadow: 0 4px 0 rgba(0,0,0,0.2);
-            margin-bottom: 45px;
-            letter-spacing: 1px;
+            text-shadow: 3px 3px 0px #c79500, 6px 6px 0px #000000;
+            margin-bottom: 35px;
+            letter-spacing: 2px;
+            text-align: center;
             opacity: 0;
             transform: scale(0.5);
             display: none;
@@ -471,15 +693,19 @@
         }
 
         .go-normal-title {
-            font-size: clamp(2.8rem, 12vw, 4.5rem);
-            font-weight: 800;
-            color: #fff;
-            line-height: 1.1;
+            font-family: 'Press Start 2P', monospace;
+            font-size: clamp(24px, 7.5vw, 42px);
+            font-weight: bold;
+            color: #ffffff;
+            line-height: 1.2;
+            text-align: center;
+            letter-spacing: 2px;
             text-shadow: 
-                0px 4px 0px #2A3D63, 
-                0px 8px 15px rgba(0, 0, 0, 0.4);
+                4px 4px 0px #ff3344, 
+                8px 8px 0px #990011,
+                12px 12px 0px #000000;
             opacity: 0;
-            margin-bottom: 20px;
+            margin-bottom: 30px;
             display: block;
         }
 
@@ -488,55 +714,65 @@
         }
 
         .go-score-label {
+            font-family: 'Press Start 2P', monospace;
             color: #d8b4fe;
-            font-size: clamp(22px, 6vw, 28px);
-            font-weight: 600;
+            font-size: clamp(11px, 3.2vw, 16px);
+            font-weight: bold;
             text-transform: uppercase;
-            text-shadow: 0 2px 0 rgba(0,0,0,0.2);
+            text-shadow: 2px 2px 0px #000000;
+            margin-bottom: 12px;
             opacity: 0;
             transform: scale(0.5);
         }
 
         .go-score-number {
+            font-family: 'Press Start 2P', monospace;
             color: #ffffff;
-            font-size: clamp(64px, 18vw, 88px);
-            font-weight: 800;
-            line-height: 0.9;
+            font-size: clamp(34px, 9vw, 58px);
+            font-weight: bold;
+            line-height: 1;
             font-variant-numeric: tabular-nums;
-            text-shadow: 0 5px 0 rgba(0,0,0,0.25);
+            text-shadow: 4px 4px 0px #000000;
             opacity: 0;
             transform: scale(0.5);
         }
 
         .go-play-button {
-            background-color: #38d977;
-            width: 80px;
-            height: 80px;
-            border-radius: 50%;
-            border: none;
+            background-color: #2ecc71;
+            width: 86px;
+            height: 86px;
+            border-radius: 0px;
+            border: 4px solid #000000;
             cursor: pointer;
             display: flex;
             justify-content: center;
             align-items: center;
-            box-shadow: 0 6px 0 #1e9b57, 0 10px 15px rgba(0,0,0,0.3);
+            box-shadow: 
+                inset 4px 4px 0px #abebc6, 
+                inset -4px -4px 0px #1e9b57, 
+                6px 6px 0px #000000;
             transition: transform 0.1s ease, box-shadow 0.1s ease;
             opacity: 0;
             transform: scale(0.5) translateY(20px);
+            margin-top: 25px;
         }
 
         .go-play-button:active {
-            transform: translateY(4px);
-            box-shadow: 0 2px 0 #1e9b57, 0 5px 5px rgba(0,0,0,0.3);
+            transform: translate(3px, 3px);
+            box-shadow: 
+                inset 4px 4px 0px #abebc6, 
+                inset -4px -4px 0px #1e9b57, 
+                3px 3px 0px #000000;
         }
 
         .go-play-icon {
             width: 0; 
             height: 0; 
-            border-top: 15px solid transparent;
-            border-bottom: 15px solid transparent;
-            border-left: 24px solid #ffffff;
+            border-top: 14px solid transparent;
+            border-bottom: 14px solid transparent;
+            border-left: 22px solid #ffffff;
             margin-left: 6px;
-            filter: drop-shadow(0 2px 0 rgba(0,0,0,0.2));
+            filter: drop-shadow(2px 2px 0px #000000);
         }
 
         @keyframes popIn {
@@ -614,43 +850,50 @@
 </head>
 <body>
 
-    <header class="header-container">
-        <!-- LIVELLO 1: Riga Superiore -->
-        <div class="level-1">
-            <!-- Sinistra: Corona + Punteggio Massimo -->
-            <div class="max-score-wrapper">
-                <svg class="crown-icon" viewBox="0 0 24 24" fill="currentColor">
-                    <path d="M5 16L3 5l5.5 5L12 4l3.5 6L21 5l-2 11H5zm0 2h14v2H5v-2z"/>
-                </svg>
-                <span id="high-score" class="max-score-value">0</span>
-            </div>
-
-            <!-- Destra: Icona Impostazioni -->
-            <div class="settings-wrapper">
-                <svg class="gear-icon" viewBox="0 0 24 24" fill="currentColor">
-                    <path d="M19.43 12.98c.04-.32.07-.64.07-.98 0-.34-.03-.66-.07-.98l2.11-1.65c.19-.15.24-.42.12-.64l-2-3.46c-.12-.22-.39-.3-.61-.22l-2.49 1c-.52-.4-1.08-.73-1.69-.98l-.38-2.65A.488.488 0 0 0 14 2h-4c-.25 0-.46.18-.49.42l-.38 2.65c-.61.25-1.17.59-1.69.98l-2.49-1c-.23-.09-.49 0-.61.22l-2 3.46c-.13.22-.07.49-.12-.64l2.11 1.65c-.04.32-.07.65-.07.98 0 .33.03.66.07.98l-2.11 1.65c-.19.15-.24.42-.12.64l2 3.46c.12.22.39.3.61.22l2.49-1c.52.4 1.08.73 1.69.98l.38 2.65c.03.24.24.42.49.42h4c.25 0 .46-.18.49-.42l.38-2.65c.61-.25 1.17-.59 1.69-.98l2.49 1c.23.09.49 0 .61-.22l2-3.46c.12-.22.07-.49-.12-.64l-2.11-1.65zM12 15.5c-1.93 0-3.5-1.57-3.5-3.5s1.57-3.5 3.5-3.5 3.5 1.57 3.5 3.5-1.57 3.5-3.5 3.5z"/>
-                </svg>
+    <div class="game-container">
+        <!-- Top Bar: Crown - MAX SCORE - Settings -->
+        <div class="top-bar">
+            <img src="assets/Gemini_Generated_Image_41xbxx41xbxx41xb-removebg-preview.png" alt="bar" class="top-bar-bg">
+            <div class="top-bar-content">
+                <img src="assets/Gemini_Generated_Image_wbdnqbwbdnqbwbdn-removebg-preview.png" alt="crown" class="icon-crown">
+                <div class="max-score-text">
+                    <span class="score-value" id="maxScoreDisplay">0</span>
+                </div>
+                <img src="assets/Gemini_Generated_Image_ooep2eooep2eooep-removebg-preview.png" alt="settings" class="icon-settings" id="btnSettings">
             </div>
         </div>
 
-        <!-- LIVELLO 2: Barra di avanzamento -->
-        <div class="level-2">
-            <div class="lines-bar">
-                <div class="dot" id="dot-1"></div>
-                <div class="dot" id="dot-2"></div>
-                <div class="dot" id="dot-3"></div>
-                <div class="dot" id="dot-4"></div>
-                <div class="dot" id="dot-5"></div>
-                <div class="dot" id="dot-6"></div>
+        <!-- Lines Cleared Section -->
+        <div class="lines-section">
+            <div class="lines-label">LINES CLEARED: <span id="linesClearedText">0/6</span></div>
+            <div class="lines-blocks" id="linesBlocksContainer">
+                <img src="assets/Pasted_image-removebg-preview.png" alt="empty" class="block blue" id="block-1">
+                <img src="assets/Pasted_image-removebg-preview.png" alt="empty" class="block blue" id="block-2">
+                <img src="assets/Pasted_image-removebg-preview.png" alt="empty" class="block blue" id="block-3">
+                <img src="assets/Pasted_image-removebg-preview.png" alt="empty" class="block blue" id="block-4">
+                <img src="assets/Pasted_image-removebg-preview.png" alt="empty" class="block blue" id="block-5">
+                <img src="assets/Pasted_image-removebg-preview.png" alt="empty" class="block blue" id="block-6">
+                
+                <div class="coin-container">
+                    <img src="assets/Gemini_Generated_Image_5zcunn5zcunn5zcu-removebg-preview.png" alt="coins" class="coins-icon">
+                    <div id="coinPlusOne" class="coin-plus-one">+1</div>
+                </div>
             </div>
-            <span id="lines-text" class="lines-text">0 / 6</span>
         </div>
 
-        <!-- LIVELLO 3: Punteggio Attuale -->
-        <div id="score" class="current-score">0</div>
-        
-        <div class="skill-status" id="skill-status"></div>
-    </header>
+        <!-- Bottom Section: Skills - Current Score (Centered) - Shop -->
+        <div class="bottom-section">
+            <img src="assets/image-removebg-preview.png" alt="Skills" class="btn-skills" id="btnSkills">
+            
+            <div class="current-score-area">
+                <div class="current-score-label">CURRENT SCORE</div>
+                <div class="current-score-digits" id="currentScoreDisplay">0</div>
+                <div class="skill-status" id="skill-status"></div>
+            </div>
+
+            <img src="assets/image-removebg-preview(1).png" alt="Shop" class="btn-shop" id="btnShop">
+        </div>
+    </div>
 
     <main>
         <div id="board"></div>
@@ -683,10 +926,10 @@
     <script>
         const BOARD_SIZE = 8;
         const boardElement = document.getElementById('board');
-        const scoreElement = document.getElementById('score');
-        const highScoreElement = document.getElementById('high-score');
+        const scoreElement = document.getElementById('currentScoreDisplay') || document.getElementById('score');
+        const highScoreElement = document.getElementById('maxScoreDisplay') || document.getElementById('high-score');
         const skillStatus = document.getElementById('skill-status');
-        const linesText = document.getElementById('lines-text');
+        const linesText = document.getElementById('linesClearedText') || document.getElementById('lines-text');
         const gameOverScreen = document.getElementById('game-over');
         const playBtn = document.getElementById('play-btn');
         const canvas = document.getElementById('confetti-canvas');
@@ -708,7 +951,8 @@
         let turnHasDragged = false;
         let gameOver = false;
 
-        highScoreElement.textContent = highScore;
+        if (highScoreElement) highScoreElement.textContent = highScore.toLocaleString();
+        if (scoreElement) scoreElement.textContent = '0';
 
         function hexToHsl(hex) {
             hex = hex.replace('#', '');
@@ -959,16 +1203,50 @@
             }
         }
 
+        function animateTextScore(container, targetScore, duration = 400) {
+            if (!container) return;
+            let startScore = parseInt(container.textContent.replace(/,/g, '')) || 0;
+            const scoreDiff = targetScore - startScore;
+            if (scoreDiff === 0) {
+                container.textContent = targetScore.toLocaleString();
+                return;
+            }
+            const startTime = performance.now();
+
+            function update(currentTime) {
+                const elapsed = currentTime - startTime;
+                const progress = Math.min(elapsed / duration, 1);
+                const eased = 1 - Math.pow(1 - progress, 3);
+                const currentValue = Math.round(startScore + (eased * scoreDiff));
+                
+                container.textContent = currentValue.toLocaleString();
+                
+                if (progress < 1) {
+                    requestAnimationFrame(update);
+                } else {
+                    container.textContent = targetScore.toLocaleString();
+                }
+            }
+            requestAnimationFrame(update);
+        }
+
         function updateScore(points) {
-            const prevScore = score;
             score += points;
-            if(scoreElement) animateNumberValue(scoreElement, prevScore, score, 400);
+            
+            const currentScoreDisplay = document.getElementById('currentScoreDisplay') || scoreElement;
+            if (currentScoreDisplay) {
+                animateTextScore(currentScoreDisplay, score, 400);
+            }
+
             if (score > sessionStartHighScore) {
-                const prevHigh = highScore;
                 achievedNewRecord = true;
                 highScore = score;
                 localStorage.setItem('blockBlast3DHighScore8x8', highScore);
-                if(highScoreElement) animateNumberValue(highScoreElement, prevHigh, highScore, 400);
+                
+                const maxScoreDisplay = document.getElementById('maxScoreDisplay') || highScoreElement;
+                if (maxScoreDisplay) {
+                    maxScoreDisplay.textContent = highScore.toLocaleString();
+                }
             }
         }
 
@@ -1080,44 +1358,59 @@
 
         function updateSkillUI() {
             let dots = linesEliminated % 6;
+            const isFull = (linesEliminated > 0 && dots === 0);
+            const filledCount = isFull ? 6 : dots;
+
             for (let i = 1; i <= 6; i++) {
-                const dot = document.getElementById(`dot-${i}`);
-                if (i <= dots || (linesEliminated > 0 && dots === 0)) { 
-                    dot.classList.add('filled');
-                } else {
-                    dot.classList.remove('filled');
+                const blockImg = document.getElementById(`block-${i}`);
+                if (blockImg) {
+                    if (i <= filledCount) {
+                        blockImg.src = 'assets/Gemini_Generated_Image_rki7ferki7ferki7-removebg-preview.png';
+                        blockImg.className = 'block green';
+                    } else {
+                        blockImg.src = 'assets/Pasted_image-removebg-preview.png';
+                        blockImg.className = 'block blue';
+                    }
                 }
             }
 
-            const nextThreshold = Math.ceil((linesEliminated + 1) / 6) * 6;
-            linesText.textContent = `${linesEliminated} / ${nextThreshold}`;
+            const nextThreshold = (Math.floor(linesEliminated / 6) + 1) * 6;
+            const linesClearedText = document.getElementById('linesClearedText');
+            if (linesClearedText) {
+                linesClearedText.textContent = `${linesEliminated}/${nextThreshold}`;
+            }
 
-            if (skillDiscardActive && !turnHasDragged) {
-                skillStatus.textContent = 'Cambiare Pezzo? (Tap)';
-            } else if (skillRotateActive) {
-                skillStatus.textContent = 'Doppio Tap per Ruotare!';
-            } else if (skillSingleActive) {
-                skillStatus.textContent = 'Punto Singolo Sbloccato!';
-            } else {
-                skillStatus.textContent = '';
+            if (skillStatus) {
+                if (skillDiscardActive && !turnHasDragged) {
+                    skillStatus.textContent = 'Cambiare Pezzo? (Tap)';
+                } else if (skillRotateActive) {
+                    skillStatus.textContent = 'Doppio Tap per Ruotare!';
+                } else if (skillSingleActive) {
+                    skillStatus.textContent = 'Punto Singolo Sbloccato!';
+                } else {
+                    skillStatus.textContent = '';
+                }
             }
         }
 
         function grantSkill() {
-            setTimeout(() => {
-                for (let i = 1; i <= 6; i++) document.getElementById(`dot-${i}`).classList.remove('filled');
-            }, 500);
+            const plusOneEl = document.getElementById('coinPlusOne');
+            if (plusOneEl) {
+                plusOneEl.classList.remove('show');
+                void plusOneEl.offsetWidth;
+                plusOneEl.classList.add('show');
+            }
 
             const rand = Math.random();
             if (rand < 0.33 && !skillSingleActive) {
                 skillSingleActive = true;
-                skillStatus.textContent = 'Punto Singolo Sbloccato!';
+                if(skillStatus) skillStatus.textContent = 'Punto Singolo Sbloccato!';
             } else if (rand < 0.66) {
                 skillRotateActive = true;
-                skillStatus.textContent = 'Doppio Tap per Ruotare!';
+                if(skillStatus) skillStatus.textContent = 'Doppio Tap per Ruotare!';
             } else {
                 skillDiscardActive = true;
-                skillStatus.textContent = 'Cambiare Pezzo? (Tap)';
+                if(skillStatus) skillStatus.textContent = 'Cambiare Pezzo? (Tap)';
             }
             updateSkillUI();
         }
@@ -1201,8 +1494,32 @@
             lastPreviewCol = col;
         }
 
+        function resetPieceElementStyle(el) {
+            if (!el) return;
+            el.classList.remove('dragging');
+            el.style.position = '';
+            el.style.left = '';
+            el.style.top = '';
+            el.style.width = '';
+            el.style.height = '';
+            el.style.transform = '';
+        }
+
+        function resetPieceElementStyle(el) {
+            if (!el) return;
+            el.classList.remove('dragging');
+            el.style.position = '';
+            el.style.left = '';
+            el.style.top = '';
+            el.style.width = '';
+            el.style.height = '';
+            el.style.transform = '';
+            el.style.transformOrigin = '';
+        }
+
         function createPieceElement(shape, slotIndex, rotated = false) {
             const slot = document.getElementById(`slot-${slotIndex}`);
+            if (!slot) return;
             slot.innerHTML = '';
             
             const pieceEl = document.createElement('div');
@@ -1227,13 +1544,23 @@
 
             slot.appendChild(pieceEl);
 
-            let pointerDownTime = 0;
             let startX = 0, startY = 0;
             let lastTap = 0;
-            
+
             pieceEl.addEventListener('pointerdown', (e) => {
                 if (gameOver) return;
-                e.preventDefault();
+                if (e.cancelable) e.preventDefault();
+
+                if (dragState && dragState.element) {
+                    resetPieceElementStyle(dragState.element);
+                }
+                dragState = null;
+                clearPreview();
+
+                try {
+                    pieceEl.setPointerCapture(e.pointerId);
+                } catch (err) {}
+
                 startX = e.clientX;
                 startY = e.clientY;
 
@@ -1249,19 +1576,29 @@
                     offsetY,
                     hasMoved: false,
                     startX,
-                    startY
+                    startY,
+                    pointerId: e.pointerId
                 };
 
-                document.addEventListener('pointermove', onDrag, { passive: false });
-                document.addEventListener('pointerup', onPointerUp);
+                window.addEventListener('pointermove', onDrag, { passive: false });
+                window.addEventListener('pointerup', onPointerUp, { passive: false });
+                window.addEventListener('pointercancel', onPointerUp, { passive: false });
             });
 
             function onPointerUp(e) {
-                document.removeEventListener('pointermove', onDrag);
-                document.removeEventListener('pointerup', onPointerUp);
-                if (!dragState) return;
+                window.removeEventListener('pointermove', onDrag);
+                window.removeEventListener('pointerup', onPointerUp);
+                window.removeEventListener('pointercancel', onPointerUp);
 
-                const { element, hasMoved } = dragState;
+                if (e && e.pointerId !== undefined && pieceEl.hasPointerCapture && pieceEl.hasPointerCapture(e.pointerId)) {
+                    try {
+                        pieceEl.releasePointerCapture(e.pointerId);
+                    } catch (err) {}
+                }
+
+                if (!dragState || dragState.element !== pieceEl) return;
+
+                const { element, hasMoved, slotIndex: currentSlot } = dragState;
 
                 if (!hasMoved) {
                     dragState = null;
@@ -1269,12 +1606,12 @@
                     const isDoubleTap = (now - lastTap) < 300;
                     lastTap = now;
 
-                    const pieceData = activePieces.find(p => p.slot === slotIndex);
+                    const pieceData = activePieces.find(p => p.slot === currentSlot);
                     
                     if (isDoubleTap && skillRotateActive && pieceData && !pieceData.rotated) {
                         pieceData.shape.matrix = rotateMatrix(pieceData.shape.matrix);
                         pieceData.rotated = true;
-                        createPieceElement(pieceData.shape, slotIndex, true);
+                        createPieceElement(pieceData.shape, currentSlot, true);
                         checkGameOver();
                         return;
                     }
@@ -1284,7 +1621,7 @@
                         if (pieceData) {
                             pieceData.shape = newShape;
                             pieceData.rotated = false;
-                            createPieceElement(newShape, slotIndex);
+                            createPieceElement(newShape, currentSlot);
                             skillDiscardActive = false;
                             updateSkillUI();
                             checkGameOver();
@@ -1321,25 +1658,15 @@
                 }
 
                 clearPreview();
-
-                element.classList.remove('dragging');
-                element.style.transform = '';
+                resetPieceElementStyle(element);
 
                 if (targetRow !== -1 && targetCol !== -1) {
                     placePiece(dragState.shape, targetRow, targetCol);
                     element.remove();
-                    activePieces = activePieces.filter(p => p.slot !== slotIndex);
+                    activePieces = activePieces.filter(p => p.slot !== currentSlot);
                     
                     checkLines();
                     spawnPieces();
-                } else {
-                    const slotContainer = document.getElementById(`slot-${slotIndex}`);
-                    element.style.left = '';
-                    element.style.top = '';
-                    element.style.position = '';
-                    element.style.width = '';
-                    element.style.height = '';
-                    slotContainer.appendChild(element);
                 }
 
                 dragState = null;
@@ -1347,29 +1674,29 @@
         }
 
         function onDrag(e) {
-            e.preventDefault();
             if (!dragState) return;
 
             const dist = Math.hypot(e.clientX - dragState.startX, e.clientY - dragState.startY);
-            if (!dragState.hasMoved && dist > 10) {
+            if (!dragState.hasMoved && dist > 3) {
                 dragState.hasMoved = true;
                 const el = dragState.element;
                 const rect = el.getBoundingClientRect();
                 el.style.width = `${rect.width}px`;
                 el.style.height = `${rect.height}px`;
                 el.classList.add('dragging');
-                document.body.appendChild(el); 
+                el.style.position = 'fixed';
                 el.style.transformOrigin = `${dragState.offsetX}px ${dragState.offsetY}px`;
             }
 
             if (dragState.hasMoved) {
+                if (e.cancelable) e.preventDefault();
                 const boardRect = boardElement.getBoundingClientRect();
                 const cellWidth = boardRect.width / BOARD_SIZE;
                 const cellHeight = boardRect.height / BOARD_SIZE;
                 
                 const pieceFirstBlock = dragState.element.querySelector('.piece-block');
-                const pieceBlockWidth = pieceFirstBlock.offsetWidth;
-                const scaleFactor = cellWidth / pieceBlockWidth;
+                const pieceBlockWidth = pieceFirstBlock ? pieceFirstBlock.offsetWidth : cellWidth;
+                const scaleFactor = pieceBlockWidth > 0 ? (cellWidth / pieceBlockWidth) : 1;
 
                 const el = dragState.element;
                 el.style.left = `${e.clientX - dragState.offsetX}px`;
@@ -2192,10 +2519,32 @@ function triggerRainbowSweep(clearedRows, clearedCols) {
         initBouncer();
         animateBouncer();
 
-        window.addEventListener('resize', () => {
-            if (bouncerX + bouncerW > window.innerWidth) bouncerX = window.innerWidth - bouncerW - 50;
-            if (bouncerY + bouncerH > window.innerHeight) bouncerY = window.innerHeight - bouncerH - 50;
-        });
+        const btnSettings = document.getElementById('btnSettings');
+        if (btnSettings) {
+            btnSettings.addEventListener('click', () => {
+                if (confirm('Vuoi ricominciare la partita?')) {
+                    initBoard();
+                }
+            });
+        }
+
+        const btnSkills = document.getElementById('btnSkills');
+        if (btnSkills) {
+            btnSkills.addEventListener('click', () => {
+                if (skillStatus && skillStatus.textContent) {
+                    alert('Skill attiva: ' + skillStatus.textContent);
+                } else {
+                    alert('Completa 6 righe per sbloccare una Skill speciale!');
+                }
+            });
+        }
+
+        const btnShop = document.getElementById('btnShop');
+        if (btnShop) {
+            btnShop.addEventListener('click', () => {
+                alert('Negozio in arrivo nei prossimi aggiornamenti!');
+            });
+        }
 
         initBoard();
     </script>

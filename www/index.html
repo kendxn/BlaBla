@@ -4,47 +4,57 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>Block Blast 3D</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&family=Silkscreen:wght@400;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="css/style.css">
 </head>
 <body>
 
-    <header class="header-container">
-        <!-- LIVELLO 1: Riga Superiore -->
-        <div class="level-1">
-            <!-- Sinistra: Corona + Punteggio Massimo -->
-            <div class="max-score-wrapper">
-                <svg class="crown-icon" viewBox="0 0 24 24" fill="currentColor">
-                    <path d="M5 16L3 5l5.5 5L12 4l3.5 6L21 5l-2 11H5zm0 2h14v2H5v-2z"/>
-                </svg>
-                <span id="high-score" class="max-score-value">0</span>
-            </div>
-
-            <!-- Destra: Icona Impostazioni -->
-            <div class="settings-wrapper">
-                <svg class="gear-icon" viewBox="0 0 24 24" fill="currentColor">
-                    <path d="M19.43 12.98c.04-.32.07-.64.07-.98 0-.34-.03-.66-.07-.98l2.11-1.65c.19-.15.24-.42.12-.64l-2-3.46c-.12-.22-.39-.3-.61-.22l-2.49 1c-.52-.4-1.08-.73-1.69-.98l-.38-2.65A.488.488 0 0 0 14 2h-4c-.25 0-.46.18-.49.42l-.38 2.65c-.61.25-1.17.59-1.69.98l-2.49-1c-.23-.09-.49 0-.61.22l-2 3.46c-.13.22-.07.49-.12-.64l2.11 1.65c-.04.32-.07.65-.07.98 0 .33.03.66.07.98l-2.11 1.65c-.19.15-.24.42-.12.64l2 3.46c.12.22.39.3.61.22l2.49-1c.52.4 1.08.73 1.69.98l.38 2.65c.03.24.24.42.49.42h4c.25 0 .46-.18.49-.42l.38-2.65c.61-.25 1.17-.59 1.69-.98l2.49 1c.23.09.49 0 .61-.22l2-3.46c.12-.22.07-.49-.12-.64l-2.11-1.65zM12 15.5c-1.93 0-3.5-1.57-3.5-3.5s1.57-3.5 3.5-3.5 3.5 1.57 3.5 3.5-1.57 3.5-3.5 3.5z"/>
-                </svg>
+    <div class="game-container">
+        <!-- Top Bar: Crown - MAX SCORE - Settings -->
+        <div class="top-bar">
+            <img src="assets/Gemini_Generated_Image_41xbxx41xbxx41xb-removebg-preview.png" alt="bar" class="top-bar-bg">
+            <div class="top-bar-content">
+                <img src="assets/Gemini_Generated_Image_wbdnqbwbdnqbwbdn-removebg-preview.png" alt="crown" class="icon-crown">
+                <div class="max-score-text">
+                    <span class="score-value" id="maxScoreDisplay">0</span>
+                </div>
+                <img src="assets/Gemini_Generated_Image_ooep2eooep2eooep-removebg-preview.png" alt="settings" class="icon-settings" id="btnSettings">
             </div>
         </div>
 
-        <!-- LIVELLO 2: Barra di avanzamento -->
-        <div class="level-2">
-            <div class="lines-bar">
-                <div class="dot" id="dot-1"></div>
-                <div class="dot" id="dot-2"></div>
-                <div class="dot" id="dot-3"></div>
-                <div class="dot" id="dot-4"></div>
-                <div class="dot" id="dot-5"></div>
-                <div class="dot" id="dot-6"></div>
+        <!-- Lines Cleared Section -->
+        <div class="lines-section">
+            <div class="lines-label">LINES CLEARED: <span id="linesClearedText">0/6</span></div>
+            <div class="lines-blocks" id="linesBlocksContainer">
+                <img src="assets/Pasted_image-removebg-preview.png" alt="empty" class="block blue" id="block-1">
+                <img src="assets/Pasted_image-removebg-preview.png" alt="empty" class="block blue" id="block-2">
+                <img src="assets/Pasted_image-removebg-preview.png" alt="empty" class="block blue" id="block-3">
+                <img src="assets/Pasted_image-removebg-preview.png" alt="empty" class="block blue" id="block-4">
+                <img src="assets/Pasted_image-removebg-preview.png" alt="empty" class="block blue" id="block-5">
+                <img src="assets/Pasted_image-removebg-preview.png" alt="empty" class="block blue" id="block-6">
+                
+                <div class="coin-container">
+                    <img src="assets/Gemini_Generated_Image_5zcunn5zcunn5zcu-removebg-preview.png" alt="coins" class="coins-icon">
+                    <div id="coinPlusOne" class="coin-plus-one">+1</div>
+                </div>
             </div>
-            <span id="lines-text" class="lines-text">0 / 6</span>
         </div>
 
-        <!-- LIVELLO 3: Punteggio Attuale -->
-        <div id="score" class="current-score">0</div>
-        
-        <div class="skill-status" id="skill-status"></div>
-    </header>
+        <!-- Bottom Section: Skills - Current Score (Centered) - Shop -->
+        <div class="bottom-section">
+            <img src="assets/image-removebg-preview.png" alt="Skills" class="btn-skills" id="btnSkills">
+            
+            <div class="current-score-area">
+                <div class="current-score-label">CURRENT SCORE</div>
+                <div class="current-score-digits" id="currentScoreDisplay">0</div>
+                <div class="skill-status" id="skill-status"></div>
+            </div>
+
+            <img src="assets/image-removebg-preview(1).png" alt="Shop" class="btn-shop" id="btnShop">
+        </div>
+    </div>
 
     <main>
         <div id="board"></div>

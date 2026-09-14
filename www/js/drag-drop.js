@@ -65,9 +65,21 @@ function showPreview(shape, row, col) {
     lastPreviewCol = col;
 }
 
+function resetPieceElementStyle(el) {
+    if (!el) return;
+    el.classList.remove('dragging');
+    el.style.position = '';
+    el.style.left = '';
+    el.style.top = '';
+    el.style.width = '';
+    el.style.height = '';
+    el.style.transform = '';
+    el.style.transformOrigin = '';
+}
+
 function createPieceElement(shape, slotIndex, rotated = false) {
     const slot = document.getElementById(`slot-${slotIndex}`);
-    if(!slot) return;
+    if (!slot) return;
     slot.innerHTML = '';
     
     const pieceEl = document.createElement('div');
@@ -92,13 +104,23 @@ function createPieceElement(shape, slotIndex, rotated = false) {
 
     slot.appendChild(pieceEl);
 
-    let pointerDownTime = 0;
     let startX = 0, startY = 0;
     let lastTap = 0;
-    
+
     pieceEl.addEventListener('pointerdown', (e) => {
         if (gameOver) return;
-        e.preventDefault();
+        if (e.cancelable) e.preventDefault();
+
+        if (dragState && dragState.element) {
+            resetPieceElementStyle(dragState.element);
+        }
+        dragState = null;
+        clearPreview();
+
+        try {
+            pieceEl.setPointerCapture(e.pointerId);
+        } catch (err) {}
+
         startX = e.clientX;
         startY = e.clientY;
 
@@ -114,19 +136,29 @@ function createPieceElement(shape, slotIndex, rotated = false) {
             offsetY,
             hasMoved: false,
             startX,
-            startY
+            startY,
+            pointerId: e.pointerId
         };
 
-        document.addEventListener('pointermove', onDrag, { passive: false });
-        document.addEventListener('pointerup', onPointerUp);
+        window.addEventListener('pointermove', onDrag, { passive: false });
+        window.addEventListener('pointerup', onPointerUp, { passive: false });
+        window.addEventListener('pointercancel', onPointerUp, { passive: false });
     });
 
     function onPointerUp(e) {
-        document.removeEventListener('pointermove', onDrag);
-        document.removeEventListener('pointerup', onPointerUp);
-        if (!dragState) return;
+        window.removeEventListener('pointermove', onDrag);
+        window.removeEventListener('pointerup', onPointerUp);
+        window.removeEventListener('pointercancel', onPointerUp);
 
-        const { element, hasMoved } = dragState;
+        if (e && e.pointerId !== undefined && pieceEl.hasPointerCapture && pieceEl.hasPointerCapture(e.pointerId)) {
+            try {
+                pieceEl.releasePointerCapture(e.pointerId);
+            } catch (err) {}
+        }
+
+        if (!dragState || dragState.element !== pieceEl) return;
+
+        const { element, hasMoved, slotIndex: currentSlot } = dragState;
 
         if (!hasMoved) {
             dragState = null;
@@ -134,12 +166,12 @@ function createPieceElement(shape, slotIndex, rotated = false) {
             const isDoubleTap = (now - lastTap) < 300;
             lastTap = now;
 
-            const pieceData = activePieces.find(p => p.slot === slotIndex);
+            const pieceData = activePieces.find(p => p.slot === currentSlot);
             
             if (isDoubleTap && skillRotateActive && pieceData && !pieceData.rotated) {
                 pieceData.shape.matrix = rotateMatrix(pieceData.shape.matrix);
                 pieceData.rotated = true;
-                createPieceElement(pieceData.shape, slotIndex, true);
+                createPieceElement(pieceData.shape, currentSlot, true);
                 checkGameOver();
                 return;
             }
@@ -149,7 +181,7 @@ function createPieceElement(shape, slotIndex, rotated = false) {
                 if (pieceData) {
                     pieceData.shape = newShape;
                     pieceData.rotated = false;
-                    createPieceElement(newShape, slotIndex);
+                    createPieceElement(newShape, currentSlot);
                     skillDiscardActive = false;
                     updateSkillUI();
                     checkGameOver();
@@ -186,25 +218,15 @@ function createPieceElement(shape, slotIndex, rotated = false) {
         }
 
         clearPreview();
-
-        element.classList.remove('dragging');
-        element.style.transform = '';
+        resetPieceElementStyle(element);
 
         if (targetRow !== -1 && targetCol !== -1) {
             placePiece(dragState.shape, targetRow, targetCol);
             element.remove();
-            activePieces = activePieces.filter(p => p.slot !== slotIndex);
+            activePieces = activePieces.filter(p => p.slot !== currentSlot);
             
             checkLines();
             spawnPieces();
-        } else {
-            const slotContainer = document.getElementById(`slot-${slotIndex}`);
-            element.style.left = '';
-            element.style.top = '';
-            element.style.position = '';
-            element.style.width = '';
-            element.style.height = '';
-            slotContainer.appendChild(element);
         }
 
         dragState = null;
@@ -212,29 +234,29 @@ function createPieceElement(shape, slotIndex, rotated = false) {
 }
 
 function onDrag(e) {
-    e.preventDefault();
     if (!dragState) return;
 
     const dist = Math.hypot(e.clientX - dragState.startX, e.clientY - dragState.startY);
-    if (!dragState.hasMoved && dist > 10) {
+    if (!dragState.hasMoved && dist > 3) {
         dragState.hasMoved = true;
         const el = dragState.element;
         const rect = el.getBoundingClientRect();
         el.style.width = `${rect.width}px`;
         el.style.height = `${rect.height}px`;
         el.classList.add('dragging');
-        document.body.appendChild(el); 
+        el.style.position = 'fixed';
         el.style.transformOrigin = `${dragState.offsetX}px ${dragState.offsetY}px`;
     }
 
     if (dragState.hasMoved) {
+        if (e.cancelable) e.preventDefault();
         const boardRect = boardElement.getBoundingClientRect();
         const cellWidth = boardRect.width / BOARD_SIZE;
         const cellHeight = boardRect.height / BOARD_SIZE;
         
         const pieceFirstBlock = dragState.element.querySelector('.piece-block');
-        const pieceBlockWidth = pieceFirstBlock.offsetWidth;
-        const scaleFactor = cellWidth / pieceBlockWidth;
+        const pieceBlockWidth = pieceFirstBlock ? pieceFirstBlock.offsetWidth : cellWidth;
+        const scaleFactor = pieceBlockWidth > 0 ? (cellWidth / pieceBlockWidth) : 1;
 
         const el = dragState.element;
         el.style.left = `${e.clientX - dragState.offsetX}px`;

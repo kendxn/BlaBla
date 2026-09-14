@@ -150,21 +150,29 @@ function spawnPieces(all = false) {
 
 function updateSkillUI() {
     let dots = linesEliminated % 6;
+    const isFull = (linesEliminated > 0 && dots === 0);
+    const filledCount = isFull ? 6 : dots;
+
     for (let i = 1; i <= 6; i++) {
-        const dot = document.getElementById(`dot-${i}`);
-        if(dot) {
-            if (i <= dots || (linesEliminated > 0 && dots === 0)) { 
-                dot.classList.add('filled');
+        const blockImg = document.getElementById(`block-${i}`);
+        if (blockImg) {
+            if (i <= filledCount) {
+                blockImg.src = 'assets/Gemini_Generated_Image_rki7ferki7ferki7-removebg-preview.png';
+                blockImg.className = 'block green';
             } else {
-                dot.classList.remove('filled');
+                blockImg.src = 'assets/Pasted_image-removebg-preview.png';
+                blockImg.className = 'block blue';
             }
         }
     }
 
-    const nextThreshold = Math.ceil((linesEliminated + 1) / 6) * 6;
-    if(linesText) linesText.textContent = `${linesEliminated} / ${nextThreshold}`;
+    const nextThreshold = (Math.floor(linesEliminated / 6) + 1) * 6;
+    const linesClearedText = document.getElementById('linesClearedText');
+    if (linesClearedText) {
+        linesClearedText.textContent = `${linesEliminated}/${nextThreshold}`;
+    }
 
-    if(skillStatus) {
+    if (skillStatus) {
         if (skillDiscardActive && !turnHasDragged) {
             skillStatus.textContent = 'Cambiare Pezzo? (Tap)';
         } else if (skillRotateActive) {
@@ -178,12 +186,12 @@ function updateSkillUI() {
 }
 
 function grantSkill() {
-    setTimeout(() => {
-        for (let i = 1; i <= 6; i++) {
-            const dot = document.getElementById(`dot-${i}`);
-            if(dot) dot.classList.remove('filled');
-        }
-    }, 500);
+    const plusOneEl = document.getElementById('coinPlusOne');
+    if (plusOneEl) {
+        plusOneEl.classList.remove('show');
+        void plusOneEl.offsetWidth;
+        plusOneEl.classList.add('show');
+    }
 
     const rand = Math.random();
     if (rand < 0.33 && !skillSingleActive) {
