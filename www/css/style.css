@@ -53,6 +53,7 @@ html, body {
     container-type: size;
     container-name: game;
     position: relative;
+    transform: translateY(-2vh);
     height: min(96dvh, 900px);
     aspect-ratio: 9 / 19.5;
     max-width: 100vw;
@@ -434,7 +435,7 @@ html, body {
 
 .skill-status {
     position: absolute;
-    bottom: -2.2cqh;
+    bottom: 0.5cqh;
     left: 50%;
     transform: translateX(-50%);
     text-align: center;
@@ -578,7 +579,7 @@ main {
 }
 
 #tray {
-    height: 16cqh;
+    height: 18cqh;
     display: flex;
     justify-content: center;
     align-items: center;
@@ -587,7 +588,7 @@ main {
     margin: 0 auto;
     padding: 0 2cqw;
     position: relative;
-    top: -4.5vh;
+    top: -6.5vh;
     z-index: 50;
     touch-action: none;
     user-select: none;
@@ -596,7 +597,7 @@ main {
 }
 
 .tray-slot {
-    width: 30%;
+    width: 31%;
     height: 100%;
     max-width: none;
     max-height: none;
@@ -608,6 +609,7 @@ main {
     touch-action: none;
     user-select: none;
     -webkit-user-select: none;
+    cursor: pointer;
 }
 
 .piece {
@@ -619,6 +621,16 @@ main {
     touch-action: none;
     user-select: none;
     -webkit-user-select: none;
+}
+
+.piece::before {
+    content: '';
+    position: absolute;
+    top: -30px;
+    bottom: -30px;
+    left: -30px;
+    right: -30px;
+    z-index: 5;
 }
 
 .piece-row {
