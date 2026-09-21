@@ -167,7 +167,50 @@ function createPieceElement(shape, slotIndex, rotated = false) {
             lastTap = now;
 
             const pieceData = activePieces.find(p => p.slot === currentSlot);
-            
+
+            // Abilità Shifting Peach 🍑 (Tap singolo PRIMA di posizionare qualsiasi pezzo)
+            if (!isDoubleTap && typeof isSkillAvailable === 'function' && isSkillAvailable('shifting_peach')) {
+                if (hasPlacedPieceInTurn) {
+                    if (skillStatus) skillStatus.textContent = 'Non disponibile dopo il piazzamento!';
+                    setTimeout(() => {
+                        if (skillStatus && skillStatus.textContent === 'Non disponibile dopo il piazzamento!') {
+                            skillStatus.textContent = '';
+                        }
+                    }, 1800);
+                    return;
+                }
+                if (pieceData) {
+                    const newShape = getRandomPieceShape();
+                    pieceData.shape = newShape;
+                    pieceData.rotated = false;
+                    createPieceElement(newShape, currentSlot);
+                    useSkill('shifting_peach');
+                    if (skillStatus) skillStatus.textContent = 'Shifting Peach 🍑 Usata!';
+                    setTimeout(() => {
+                        if (skillStatus && skillStatus.textContent === 'Shifting Peach 🍑 Usata!') {
+                            skillStatus.textContent = '';
+                        }
+                    }, 1500);
+                    checkGameOver();
+                    return;
+                }
+            }
+
+            // Abilità Curved Banana 🍌 (Doppio tap per ruotare)
+            if (isDoubleTap && typeof isSkillAvailable === 'function' && isSkillAvailable('curved_banana') && pieceData) {
+                pieceData.shape.matrix = rotateMatrix(pieceData.shape.matrix);
+                createPieceElement(pieceData.shape, currentSlot, true);
+                useSkill('curved_banana');
+                if (skillStatus) skillStatus.textContent = 'Curved Banana 🍌 Usata!';
+                setTimeout(() => {
+                    if (skillStatus && skillStatus.textContent === 'Curved Banana 🍌 Usata!') {
+                        skillStatus.textContent = '';
+                    }
+                }, 1500);
+                checkGameOver();
+                return;
+            }
+
             if (isDoubleTap && skillRotateActive && pieceData && !pieceData.rotated) {
                 pieceData.shape.matrix = rotateMatrix(pieceData.shape.matrix);
                 pieceData.rotated = true;
@@ -224,6 +267,8 @@ function createPieceElement(shape, slotIndex, rotated = false) {
             placePiece(dragState.shape, targetRow, targetCol);
             element.remove();
             activePieces = activePieces.filter(p => p.slot !== currentSlot);
+            hasPlacedPieceInTurn = true;
+            updateSkillUI();
             
             checkLines();
             spawnPieces();

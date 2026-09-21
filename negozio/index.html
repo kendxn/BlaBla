@@ -13,29 +13,35 @@
 
         <!-- Top Bar: Crown - MAX SCORE - Settings -->
         <div class="top-bar">
-            <img src="assets/Gemini_Generated_Image_41xbxx41xbxx41xb-removebg-preview.png" alt="bar" class="top-bar-bg">
+            <img src="assets/top_bar_bg.png" alt="bar" class="top-bar-bg">
             <div class="top-bar-content">
-                <img src="assets/Gemini_Generated_Image_wbdnqbwbdnqbwbdn-removebg-preview.png" alt="crown" class="icon-crown">
+                <img src="assets/crown_icon.png" alt="crown" class="icon-crown">
                 <div class="max-score-text">
                     <span class="score-value" id="maxScoreDisplay"></span>
                 </div>
-                <img src="assets/Gemini_Generated_Image_ooep2eooep2eooep-removebg-preview.png" alt="settings" class="icon-settings">
+                <img src="assets/settings_icon.png" alt="settings" class="icon-settings">
             </div>
         </div>
 
         <!-- Lines Cleared Section -->
         <div class="lines-section">
-            <div class="lines-label">LINES CLEARED: <span id="linesClearedText">4/6</span></div>
             <div class="lines-blocks">
-                <img src="assets/Gemini_Generated_Image_rki7ferki7ferki7-removebg-preview.png" alt="filled" class="block green">
-                <img src="assets/Gemini_Generated_Image_rki7ferki7ferki7-removebg-preview.png" alt="filled" class="block green">
-                <img src="assets/Gemini_Generated_Image_rki7ferki7ferki7-removebg-preview.png" alt="filled" class="block green">
-                <img src="assets/Gemini_Generated_Image_rki7ferki7ferki7-removebg-preview.png" alt="filled" class="block green">
-                <img src="assets/Pasted_image-removebg-preview.png" alt="empty" class="block blue" id="block-5">
-                <img src="assets/Pasted_image-removebg-preview.png" alt="empty" class="block blue" id="block-6">
-                
+                <div class="lines-count-banner">
+                    <span id="linesClearedText" class="lines-count-inline">4/6</span>
+                </div>
+
+                <img src="assets/line_block_filled.png" alt="filled" class="block green">
+                <img src="assets/line_block_filled.png" alt="filled" class="block green">
+                <img src="assets/line_block_filled.png" alt="filled" class="block green">
+                <img src="assets/line_block_filled.png" alt="filled" class="block green">
+                <img src="assets/line_block_empty.png" alt="empty" class="block blue" id="block-5">
+                <img src="assets/line_block_empty.png" alt="empty" class="block blue" id="block-6">
+
                 <div class="coin-container">
-                    <img src="assets/Gemini_Generated_Image_5zcunn5zcunn5zcu-removebg-preview.png" alt="coins" class="coins-icon">
+                    <img src="assets/coin_icon.png" alt="coins" class="coins-icon">
+                    <div class="coin-banner-box">
+                        <span class="coin-count-number" id="linesCoinDisplay">0</span>
+                    </div>
                     <div id="coinPlusOne" class="coin-plus-one">+1</div>
                 </div>
             </div>
@@ -43,14 +49,16 @@
 
         <!-- Bottom Section: Skills - Current Score (Centered) - Shop -->
         <div class="bottom-section">
-            <img src="assets/image-removebg-preview.png" alt="Skills" class="btn-skills" id="btnSkills">
+            <img src="assets/btn_skills.png" alt="Skills" class="btn-skills" id="btnSkills">
             
             <div class="current-score-area">
-                <div class="current-score-label">CURRENT SCORE</div>
-                <div class="current-score-digits" id="currentScoreDisplay">15,740</div>
+                <div class="score-display-wrapper">
+                    <img src="assets/score_display_bg.png" alt="Current Score" class="score-display-bg">
+                    <div class="current-score-digits long-score" id="currentScoreDisplay">15,740</div>
+                </div>
             </div>
 
-            <img src="assets/image-removebg-preview(1).png" alt="Shop" class="btn-shop" id="btnShop">
+            <img src="assets/btn_shop.png" alt="Shop" class="btn-shop" id="btnShop">
         </div>
 
         <!-- Sparkle effects removed as requested -->

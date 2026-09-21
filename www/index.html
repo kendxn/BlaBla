@@ -11,59 +11,69 @@
 </head>
 <body>
 
-    <div class="game-container">
-        <!-- Top Bar: Crown - MAX SCORE - Settings -->
-        <div class="top-bar">
-            <img src="assets/Gemini_Generated_Image_41xbxx41xbxx41xb-removebg-preview.png" alt="bar" class="top-bar-bg">
-            <div class="top-bar-content">
-                <img src="assets/Gemini_Generated_Image_wbdnqbwbdnqbwbdn-removebg-preview.png" alt="crown" class="icon-crown">
-                <div class="max-score-text">
-                    <span class="score-value" id="maxScoreDisplay">0</span>
+    <div id="app-wrapper">
+        <div class="game-container">
+            <!-- Top Bar: Crown - MAX SCORE - Settings -->
+            <div class="top-bar">
+                <img src="assets/top_bar_bg.png" alt="bar" class="top-bar-bg">
+                <div class="top-bar-content">
+                    <img src="assets/crown_icon.png" alt="crown" class="icon-crown">
+                    <div class="max-score-text">
+                        <span class="score-value" id="maxScoreDisplay">0</span>
+                    </div>
+                    <img src="assets/settings_icon.png" alt="settings" class="icon-settings" id="btnSettings">
                 </div>
-                <img src="assets/Gemini_Generated_Image_ooep2eooep2eooep-removebg-preview.png" alt="settings" class="icon-settings" id="btnSettings">
             </div>
-        </div>
 
-        <!-- Lines Cleared Section -->
-        <div class="lines-section">
-            <div class="lines-label">LINES CLEARED: <span id="linesClearedText">0/6</span></div>
-            <div class="lines-blocks" id="linesBlocksContainer">
-                <img src="assets/Pasted_image-removebg-preview.png" alt="empty" class="block blue" id="block-1">
-                <img src="assets/Pasted_image-removebg-preview.png" alt="empty" class="block blue" id="block-2">
-                <img src="assets/Pasted_image-removebg-preview.png" alt="empty" class="block blue" id="block-3">
-                <img src="assets/Pasted_image-removebg-preview.png" alt="empty" class="block blue" id="block-4">
-                <img src="assets/Pasted_image-removebg-preview.png" alt="empty" class="block blue" id="block-5">
-                <img src="assets/Pasted_image-removebg-preview.png" alt="empty" class="block blue" id="block-6">
+            <!-- Lines Cleared Section -->
+            <div class="lines-section">
+                <div class="lines-blocks" id="linesBlocksContainer">
+                    <div class="lines-count-banner">
+                        <span id="linesClearedText" class="lines-count-inline">0/6</span>
+                    </div>
+
+                    <img src="assets/line_block_empty.png" alt="empty" class="block blue" id="block-1">
+                    <img src="assets/line_block_empty.png" alt="empty" class="block blue" id="block-2">
+                    <img src="assets/line_block_empty.png" alt="empty" class="block blue" id="block-3">
+                    <img src="assets/line_block_empty.png" alt="empty" class="block blue" id="block-4">
+                    <img src="assets/line_block_empty.png" alt="empty" class="block blue" id="block-5">
+                    <img src="assets/line_block_empty.png" alt="empty" class="block blue" id="block-6">
+
+                    <div class="coin-container">
+                        <img src="assets/coin_icon.png" alt="coins" class="coins-icon">
+                        <div class="coin-banner-box">
+                            <span class="coin-count-number" id="linesCoinDisplay">0</span>
+                        </div>
+                        <div id="coinPlusOne" class="coin-plus-one">+1</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Bottom Section: Skills - Current Score (Centered) - Shop -->
+            <div class="bottom-section">
+                <img src="assets/btn_skills.png" alt="Skills" class="btn-skills" id="btnSkills">
                 
-                <div class="coin-container">
-                    <img src="assets/Gemini_Generated_Image_5zcunn5zcunn5zcu-removebg-preview.png" alt="coins" class="coins-icon">
-                    <div id="coinPlusOne" class="coin-plus-one">+1</div>
+                <div class="current-score-area">
+                    <div class="score-display-wrapper">
+                        <img src="assets/score_display_bg.png" alt="Current Score" class="score-display-bg">
+                        <div class="current-score-digits" id="currentScoreDisplay">0</div>
+                    </div>
                 </div>
+
+                <img src="assets/btn_shop.png" alt="Shop" class="btn-shop" id="btnShop">
             </div>
         </div>
 
-        <!-- Bottom Section: Skills - Current Score (Centered) - Shop -->
-        <div class="bottom-section">
-            <img src="assets/image-removebg-preview.png" alt="Skills" class="btn-skills" id="btnSkills">
-            
-            <div class="current-score-area">
-                <div class="current-score-label">CURRENT SCORE</div>
-                <div class="current-score-digits" id="currentScoreDisplay">0</div>
-                <div class="skill-status" id="skill-status"></div>
-            </div>
+        <main>
+            <div id="board"></div>
+        </main>
 
-            <img src="assets/image-removebg-preview(1).png" alt="Shop" class="btn-shop" id="btnShop">
+        <div id="tray">
+            <div class="tray-slot" id="slot-0"></div>
+            <div class="tray-slot" id="slot-1"></div>
+            <div class="tray-slot" id="slot-2"></div>
         </div>
-    </div>
-
-    <main>
-        <div id="board"></div>
-    </main>
-
-    <div id="tray">
-        <div class="tray-slot" id="slot-0"></div>
-        <div class="tray-slot" id="slot-1"></div>
-        <div class="tray-slot" id="slot-2"></div>
+        <div class="skill-status" id="skill-status"></div>
     </div>
 
     <div id="game-over">
@@ -88,5 +98,6 @@
     <script src="js/grid.js"></script>
     <script src="js/pieces.js"></script>
     <script src="js/drag-drop.js"></script>
+    <script src="js/crt-effect.js"></script>
 </body>
 </html>

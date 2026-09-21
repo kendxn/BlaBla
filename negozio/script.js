@@ -20,7 +20,7 @@
     'use strict';
 
     // ===== Configuration & State =====
-    const SPRITE_SHEET_SRC = 'assets/image-removebg-preview(2).png';
+    const SPRITE_SHEET_SRC = 'assets/btn_skills.png';
     let gameState = {
         maxScore: 48320,
         currentScore: 15740,
@@ -101,7 +101,12 @@
      * Animates score counting up with easing for text (Used for CURRENT SCORE).
      */
     function animateTextScore(container, targetScore, duration) {
-        // Parse current value to start from it if possible
+        if (!container) return;
+        if (targetScore >= 1000) {
+            container.classList.add('long-score');
+        } else {
+            container.classList.remove('long-score');
+        }
         let startScore = parseInt(container.textContent.replace(/,/g, '')) || 0;
         const scoreDiff = targetScore - startScore;
         const startTime = performance.now();
@@ -112,6 +117,12 @@
             const eased = 1 - Math.pow(1 - progress, 3); // Cubic ease out
             const currentValue = Math.round(startScore + (eased * scoreDiff));
             
+            if (currentValue >= 1000) {
+                container.classList.add('long-score');
+            } else {
+                container.classList.remove('long-score');
+            }
+
             container.textContent = currentValue.toLocaleString();
             
             if (progress < 1) {
@@ -180,7 +191,7 @@
                 if (block.classList.contains('green')) {
                     block.classList.remove('green');
                     block.classList.add('blue');
-                    block.src = 'assets/Pasted_image-removebg-preview.png'; // Immagine quadratino blu
+                    block.src = 'assets/line_block_empty.png'; // Immagine quadratino blu
                 }
             });
         } else {

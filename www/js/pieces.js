@@ -10,6 +10,9 @@ const BASE_SHAPES = [
     // Pezzi I 4x1 Orizzontale & Verticale
     { matrix: [[1,1,1,1]] },
     { matrix: [[1],[1],[1],[1]] },
+    // Pezzi I 5x1 Orizzontale & Verticale (Grandi)
+    { matrix: [[1,1,1,1,1]] },
+    { matrix: [[1],[1],[1],[1],[1]] },
     // Pezzi I 1x2, 1x3, 2x1, 3x1
     { matrix: [[1,1]] },
     { matrix: [[1,1,1]] },
@@ -136,6 +139,8 @@ function spawnPieces(all = false) {
     turnHasDragged = false;
 
     if (all || activePieces.length === 0) {
+        hasPlacedPieceInTurn = false;
+        if (typeof resetTurnSkills === 'function') resetTurnSkills();
         activePieces = [];
         const newPieces = generateThreePieces(boardState);
         for (let i = 0; i < 3; i++) {
@@ -148,32 +153,50 @@ function spawnPieces(all = false) {
     checkGameOver();
 }
 
+let lastFilledCount = -1;
+
 function updateSkillUI() {
     let dots = linesEliminated % 6;
-    const isFull = (linesEliminated > 0 && dots === 0);
-    const filledCount = isFull ? 6 : dots;
+    const filledCount = dots;
+
+    const stepDuration = 0.90;
+    const totalDuration = filledCount > 0 ? (filledCount * stepDuration) + 's' : '1.5s';
+    const hasIncreased = filledCount !== lastFilledCount;
+    lastFilledCount = filledCount;
 
     for (let i = 1; i <= 6; i++) {
         const blockImg = document.getElementById(`block-${i}`);
         if (blockImg) {
             if (i <= filledCount) {
-                blockImg.src = 'assets/Gemini_Generated_Image_rki7ferki7ferki7-removebg-preview.png';
+                blockImg.src = 'assets/line_block_filled.png';
+                blockImg.style.setProperty('--wave-duration', totalDuration);
+                blockImg.style.setProperty('--wave-delay', ((i - 1) * stepDuration) + 's');
+                if (hasIncreased) {
+                    blockImg.style.animation = 'none';
+                    void blockImg.offsetWidth;
+                    blockImg.style.animation = '';
+                }
                 blockImg.className = 'block green';
             } else {
-                blockImg.src = 'assets/Pasted_image-removebg-preview.png';
+                blockImg.src = 'assets/line_block_empty.png';
+                blockImg.style.removeProperty('--wave-duration');
+                blockImg.style.removeProperty('--wave-delay');
+                blockImg.style.animation = '';
                 blockImg.className = 'block blue';
             }
         }
     }
 
-    const nextThreshold = (Math.floor(linesEliminated / 6) + 1) * 6;
+    const displayCount = linesEliminated % 6;
     const linesClearedText = document.getElementById('linesClearedText');
     if (linesClearedText) {
-        linesClearedText.textContent = `${linesEliminated}/${nextThreshold}`;
+        linesClearedText.textContent = `${displayCount}/6`;
     }
 
     if (skillStatus) {
-        if (skillDiscardActive && !turnHasDragged) {
+        if (typeof isSkillAvailable === 'function' && isSkillAvailable('shifting_peach') && !hasPlacedPieceInTurn) {
+            skillStatus.textContent = 'Shifting Peach 🍑: Tap pezzo';
+        } else if (skillDiscardActive && !turnHasDragged) {
             skillStatus.textContent = 'Cambiare Pezzo? (Tap)';
         } else if (skillRotateActive) {
             skillStatus.textContent = 'Doppio Tap per Ruotare!';
@@ -185,7 +208,40 @@ function updateSkillUI() {
     }
 }
 
+function updateDigitScaling(element, val, baseSizeCqh) {
+    if (!element) return;
+    const strVal = String(val).replace(/,/g, '').replace(/\./g, '');
+    const numDigits = Math.max(1, strVal.length);
+    const scaleFactor = Math.pow(0.85, numDigits - 1);
+    const finalSize = (baseSizeCqh * scaleFactor).toFixed(2);
+    element.style.fontSize = `${finalSize}cqh`;
+}
+
+let userCoins = 0;
+
+function updateCoinsDisplay() {
+    const els = document.querySelectorAll('#linesCoinDisplay, #topBarCoinsDisplay, .coin-count-number, .coins-count');
+    els.forEach(el => {
+        el.textContent = userCoins;
+        updateDigitScaling(el, userCoins, 1.88);
+    });
+}
+
+function resetCoins() {
+    userCoins = 0;
+    updateCoinsDisplay();
+}
+
+if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', updateCoinsDisplay);
+} else {
+    updateCoinsDisplay();
+}
+
 function grantSkill() {
+    userCoins += 1;
+    updateCoinsDisplay();
+
     const plusOneEl = document.getElementById('coinPlusOne');
     if (plusOneEl) {
         plusOneEl.classList.remove('show');

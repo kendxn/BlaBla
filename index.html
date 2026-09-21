@@ -39,19 +39,40 @@
             font-style: normal;
         }
 
-        body {
-            background-image: url('assets/Gemini_Generated_Image_fcv39gfcv39gfcv3.jpg');
+        html, body {
+            background-image: url('assets/bg_blue_tiles.jpg');
             background-size: cover;
             background-position: center;
             background-attachment: fixed;
             color: var(--text-color);
             display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100dvh;
+            width: 100vw;
+            margin: 0;
+            padding: 0;
+            overflow: hidden;
+            touch-action: none;
+            font-family: 'PressStart2P', 'Press Start 2P', monospace, sans-serif;
+        }
+
+        #app-wrapper {
+            container-type: size;
+            container-name: game;
+            position: relative;
+            height: min(96dvh, 900px);
+            aspect-ratio: 9 / 19.5;
+            max-width: 100vw;
+            width: auto;
+            margin: auto;
+            display: flex;
             flex-direction: column;
             align-items: center;
-            height: 100vh;
-            height: 100dvh;
+            justify-content: space-between;
             overflow: hidden;
-            font-family: 'PressStart2P', 'Press Start 2P', monospace, sans-serif;
+            box-sizing: border-box;
+            padding: 0.5cqh 0 1cqh;
         }
 
         /* Testo Pixel Art per schermata Game Over e Titoli */
@@ -70,9 +91,9 @@
         */
         .game-container {
             position: relative;
-            width: 100vw;
-            height: 25vh;
-            margin-top: 1vh;
+            width: 100%;
+            height: 24cqh;
+            margin-top: 0;
             border: none;
             box-shadow: none;
             flex-shrink: 0;
@@ -80,12 +101,12 @@
 
         .top-bar {
             position: absolute;
-            top: 5%;
+            top: calc(5% + 1.5cqh);
             left: 50%;
             transform: translateX(-50%);
-            width: 90%;
-            max-width: 450px;
-            height: 18%;
+            width: 93.6%;
+            max-width: none;
+            height: 19.4%;
             z-index: 10;
         }
 
@@ -96,10 +117,7 @@
             width: 100%;
             height: 100%;
             object-fit: fill;
-            filter: 
-                drop-shadow(-8px 0 12px rgba(0,0,0,0.45))
-                drop-shadow(8px 0 12px rgba(0,0,0,0.45))
-                drop-shadow(0 4px 8px rgba(0,0,0,0.35));
+            filter: drop-shadow(0 0.5cqh 0 rgba(0,0,0,0.4));
         }
 
         .top-bar-content {
@@ -116,10 +134,10 @@
         }
 
         .icon-crown {
-            height: 85%;
+            height: 82.45%;
             width: auto;
             object-fit: contain;
-            filter: drop-shadow(2px 2px 3px rgba(0,0,0,0.4));
+            filter: drop-shadow(0 0.5cqh 0 rgba(0,0,0,0.32));
             animation: crownBounce 2s ease-in-out infinite;
         }
 
@@ -131,27 +149,35 @@
         .max-score-text {
             display: flex;
             align-items: center;
-            gap: 1.5vw;
-            margin-left: 2vw;
+            gap: 1.5cqw;
+            margin-left: 2cqw;
             margin-right: auto;
             font-family: 'PressStart2P', 'Press Start 2P', monospace;
-            font-size: clamp(14px, 3.7vw, 24px);
-            color: #4a3520;
-            text-shadow: 2px 2px 0 rgba(255,255,255,0.3);
+            font-size: 2.2cqh;
+            color: #ffffff;
+            text-shadow: 
+                1.4px 1.4px 0 #000000,
+                -1.4px -1.4px 0 #000000,
+                1.4px -1.4px 0 #000000,
+                -1.4px 1.4px 0 #000000,
+                0 1.4px 0 #000000,
+                1.4px 0 0 #000000,
+                0 -1.4px 0 #000000,
+                -1.4px 0 0 #000000;
             letter-spacing: 1px;
         }
 
         .max-score-text .score-value {
             display: flex;
             align-items: center;
-            gap: 0.2vw;
+            gap: 0.2cqw;
         }
 
         .icon-settings {
-            height: 70%;
+            height: 67.9%;
             width: auto;
             object-fit: contain;
-            filter: drop-shadow(2px 2px 3px rgba(0,0,0,0.4));
+            filter: drop-shadow(0 0.5cqh 0 rgba(0,0,0,0.32));
             cursor: pointer;
             transition: transform 0.3s ease;
         }
@@ -163,143 +189,193 @@
         /* ===== LINES CLEARED SECTION ===== */
         .lines-section {
             position: absolute;
-            top: 28%;
+            top: calc(28% + 2.5cqh);
             left: 50%;
             transform: translateX(-50%);
-            width: 90%;
-            max-width: 450px;
+            width: 78.5%;
+            max-width: none;
             z-index: 10;
             display: flex;
             flex-direction: column;
             align-items: center;
-            gap: 1vh;
+            gap: 0.9cqh;
         }
 
-        .lines-label {
+        .lines-count-banner {
+            background: url('assets/banner_bg.png') no-repeat center / 100% 100%;
+            height: 4.23cqh;
+            width: 18.7cqw;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            padding: 0;
+            box-sizing: border-box;
+            image-rendering: pixelated;
+            filter: drop-shadow(0 0.5cqh 0 rgba(0,0,0,0.48));
+            margin-right: calc(0.8cqw + 0.8cqh);
+            flex-shrink: 0;
+        }
+
+        .lines-count-inline {
             font-family: 'PressStart2P', 'Press Start 2P', monospace;
-            font-size: clamp(11px, 3.2vw, 20px);
+            font-size: 1.53cqh;
             color: #ffffff;
             text-shadow: 
-                3px 3px 0 #000000,
-                -3px -3px 0 #000000,
-                3px -3px 0 #000000,
-                -3px 3px 0 #000000,
-                0 4px 0 #000000,
-                4px 0 0 #000000;
+                1.4px 1.4px 0 #000000,
+                -1.4px -1.4px 0 #000000,
+                1.4px -1.4px 0 #000000,
+                -1.4px 1.4px 0 #000000,
+                0 1.4px 0 #000000,
+                1.4px 0 0 #000000,
+                0 -1.4px 0 #000000,
+                -1.4px 0 0 #000000;
+            margin: 0;
             letter-spacing: 1px;
-            background: none;
-            border: none;
-            padding: 0;
+            white-space: nowrap;
         }
 
         .lines-blocks {
             display: flex;
             align-items: center;
-            gap: 1vw;
+            gap: 0.75cqw;
         }
 
         .lines-blocks .block {
-            height: clamp(26px, 7vw, 50px);
-            width: clamp(26px, 7vw, 50px);
+            height: 3.46cqh;
+            width: 3.46cqh;
             object-fit: contain;
             image-rendering: pixelated;
-            filter: drop-shadow(3px 4px 5px rgba(0,0,0,0.6));
+            filter: drop-shadow(0 0.5cqh 0 rgba(0,0,0,0.48));
             transition: transform 0.2s ease;
         }
 
         .lines-blocks .block.green {
-            animation: blockWaveSweep 2.5s ease-in-out infinite;
+            animation: blockWaveSweep var(--wave-duration, 1.5s) ease-in-out infinite;
+            animation-delay: var(--wave-delay, 0s);
         }
-
-        .lines-blocks .block.green:nth-child(1) { animation-delay: 0s; }
-        .lines-blocks .block.green:nth-child(2) { animation-delay: 0.42s; }
-        .lines-blocks .block.green:nth-child(3) { animation-delay: 0.84s; }
-        .lines-blocks .block.green:nth-child(4) { animation-delay: 1.26s; }
-        .lines-blocks .block.green:nth-child(5) { animation-delay: 1.68s; }
-        .lines-blocks .block.green:nth-child(6) { animation-delay: 2.1s; }
 
         @keyframes blockWaveSweep {
-            0% { transform: scale(1); filter: drop-shadow(3px 4px 5px rgba(0,0,0,0.6)) brightness(1); }
-            12% { transform: scale(1.05); filter: drop-shadow(0 0 10px rgba(80,255,120,0.9)) brightness(1.35); }
-            25%, 100% { transform: scale(1); filter: drop-shadow(3px 4px 5px rgba(0,0,0,0.6)) brightness(1); }
-        }
-
-        .coins-icon {
-            height: clamp(30px, 8vw, 55px);
-            width: auto;
-            object-fit: contain;
-            image-rendering: pixelated;
-            filter: drop-shadow(3px 4px 5px rgba(0,0,0,0.6));
-            animation: coinsSpin 3s ease-in-out infinite;
+            0% { transform: scale(1); filter: drop-shadow(0 0.5cqh 0 rgba(0,0,0,0.48)) brightness(1); }
+            30% { transform: scale(1.03); filter: drop-shadow(0 0.5cqh 3px rgba(80,255,120,0.3)) brightness(1.1); }
+            60%, 100% { transform: scale(1); filter: drop-shadow(0 0.5cqh 0 rgba(0,0,0,0.48)) brightness(1); }
         }
 
         .coin-container {
             position: relative;
-            display: flex;
+            display: inline-flex;
             align-items: center;
-            margin-left: 1vw;
+            margin-left: calc(0.8cqw + 0.8cqh);
+            filter: drop-shadow(0 0.5cqh 0 rgba(0,0,0,0.48));
+        }
+
+        .coins-icon {
+            position: absolute;
+            left: -1.8cqw;
+            top: 50%;
+            transform: translateY(-50%);
+            height: 4.46cqh;
+            width: auto;
+            object-fit: contain;
+            image-rendering: pixelated;
+            z-index: 2;
+            animation: coinsSpin 3s ease-in-out infinite;
+        }
+
+        .coin-banner-box {
+            background: url('assets/banner_bg.png') no-repeat center / 100% 100%;
+            height: 4.23cqh;
+            width: 18.7cqw;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            padding-left: 1.5cqw;
+            padding-right: 0;
+            box-sizing: border-box;
+            image-rendering: pixelated;
+            flex-shrink: 0;
+        }
+
+        .coin-count-number {
+            font-family: 'PressStart2P', 'Press Start 2P', monospace;
+            font-size: 1.69cqh;
+            color: #ffd700;
+            text-shadow: 
+                1.4px 1.4px 0 #000000,
+                -1.4px -1.4px 0 #000000,
+                1.4px -1.4px 0 #000000,
+                -1.4px 1.4px 0 #000000,
+                0 1.4px 0 #000000,
+                1.4px 0 0 #000000,
+                0 -1.4px 0 #000000,
+                -1.4px 0 0 #000000;
+            margin: 0 0 0 1.2cqw;
+            letter-spacing: 1px;
         }
 
         .coin-plus-one {
             position: absolute;
-            top: -10px;
-            right: -15px;
-            color: #ffea00;
-            font-size: clamp(14px, 4vw, 24px);
-            font-family: 'PressStart2P', 'Press Start 2P', monospace;
-            text-shadow: 2px 2px 0 #000, -2px -2px 0 #000, 2px -2px 0 #000, -2px 2px 0 #000;
+            top: -2.2cqh;
+            right: 0;
+            font-family: 'Press Start 2P', cursive;
+            font-size: 1.8cqh;
+            color: #ffd700;
+            text-shadow: 2px 2px 0 #000, -1px -1px 0 #000, 1px -1px 0 #000, -1px 1px 0 #000, 0 0 8px #ffaa00;
             opacity: 0;
             pointer-events: none;
+            transition: all 0.3s ease;
         }
 
         .coin-plus-one.show {
-            animation: floatUpFade 1s ease-out forwards;
+            animation: floatUpPlusOne 1.2s ease-out forwards;
         }
 
-        @keyframes floatUpFade {
-            0% { opacity: 0; transform: translateY(10px) scale(0.5); }
-            20% { opacity: 1; transform: translateY(0) scale(1.2); }
-            80% { opacity: 1; transform: translateY(-15px) scale(1); }
-            100% { opacity: 0; transform: translateY(-25px) scale(1); }
+        @keyframes floatUpPlusOne {
+            0% { opacity: 0; transform: translateY(10px) scale(0.8); }
+            20% { opacity: 1; transform: translateY(-5px) scale(1.2); }
+            80% { opacity: 1; transform: translateY(-25px) scale(1); }
+            100% { opacity: 0; transform: translateY(-35px) scale(0.9); }
         }
 
         @keyframes coinsSpin {
-            0%, 100% { transform: rotate(0deg) scale(1); }
-            25% { transform: rotate(-5deg) scale(1.05); }
-            75% { transform: rotate(5deg) scale(1.05); }
+            0% { transform: translateY(-50%) scale(1) rotate(0deg); }
+            50% { transform: translateY(-50%) scale(1.1) rotate(5deg); }
+            100% { transform: translateY(-50%) scale(1) rotate(0deg); }
         }
 
-        /* ===== BOTTOM SECTION (Buttons + Score Centered) ===== */
+        /* ===== BOTTOM SECTION ===== */
         .bottom-section {
             position: absolute;
             bottom: 0;
             left: 50%;
-            transform: translateX(-50%);
-            width: 90%;
-            max-width: 450px;
-            height: 35%;
+            transform: translate(-50%, 1.5vh);
+            width: 92.15%;
+            max-width: none;
+            height: 37%;
             z-index: 5;
             display: flex;
             align-items: center;
-            justify-content: space-between;
+            justify-content: center;
+            gap: 0;
         }
 
         .btn-skills,
         .btn-shop {
-            height: 107%;
+            height: 10.78cqh;
             width: auto;
-            max-width: 38%;
+            max-width: 28.05cqw;
+            flex: 0 0 auto;
             object-fit: contain;
             image-rendering: pixelated;
-            filter: drop-shadow(3px 4px 6px rgba(0,0,0,0.5));
+            filter: drop-shadow(0 0.5cqh 0 rgba(0,0,0,0.4));
             cursor: pointer;
             transition: transform 0.2s ease, filter 0.2s ease;
+            z-index: 6;
         }
 
         .btn-skills:hover,
         .btn-shop:hover {
             transform: scale(1.08);
-            filter: drop-shadow(3px 4px 10px rgba(255,200,100,0.5));
+            filter: drop-shadow(0 0.5cqh 5px rgba(255,200,100,0.4));
         }
 
         .btn-skills:active,
@@ -309,62 +385,99 @@
 
         /* ===== CURRENT SCORE AREA ===== */
         .current-score-area {
+            position: relative;
             display: flex;
             flex-direction: column;
             align-items: center;
             justify-content: center;
-            flex: 1;
+            flex: 0 0 auto;
             text-align: center;
             z-index: 10;
+            margin: 0 -4px;
         }
 
-        .current-score-label {
-            font-family: 'PressStart2P', 'Press Start 2P', monospace;
-            font-size: clamp(8px, 2.2vw, 15px);
-            color: #e8c88a;
-            text-shadow: 
-                2px 2px 0 #2a1a0a,
-                -1px -1px 0 #2a1a0a,
-                1px -1px 0 #2a1a0a,
-                -1px 1px 0 #2a1a0a;
-            letter-spacing: 1px;
-            font-weight: bold;
-            margin-bottom: 0.5vh;
-            transform: translateY(1vh);
+        .score-display-wrapper {
+            position: relative;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            width: calc(22.75cqh + 1.75vh);
+            max-width: 54.3cqw;
+        }
+
+        .score-display-bg {
+            width: 100%;
+            height: auto;
+            object-fit: contain;
+            image-rendering: pixelated;
+            image-rendering: crisp-edges;
+            filter: drop-shadow(0 0.5cqh 0 rgba(0,0,0,0.4));
+            display: block;
         }
 
         .current-score-digits {
+            position: absolute;
+            top: 56%;
+            left: 50%;
+            transform: translate(-50%, -50%);
             font-family: 'PressStart2P', 'Press Start 2P', monospace;
-            font-size: clamp(47px, 11.4vw, 88px); 
+            font-size: 3.6cqh;
             color: #ffffff;
             text-shadow: 
-                3px 3px 0 #000000,
-                -3px -3px 0 #000000,
-                3px -3px 0 #000000,
-                -3px 3px 0 #000000,
-                0 3px 0 #000000,
-                3px 0 0 #000000,
-                0 -3px 0 #000000,
-                -3px 0 0 #000000;
+                2px 2px 0 #000000,
+                -2px -2px 0 #000000,
+                2px -2px 0 #000000,
+                -2px 2px 0 #000000,
+                0 2px 0 #000000,
+                2px 0 0 #000000;
             line-height: 1;
-            margin-top: 3vh;
+            margin: 0;
+            width: 76%;
+            text-align: center;
+            white-space: nowrap;
+        }
+
+        .current-score-digits.long-score {
+            font-size: 3.2cqh;
         }
 
         .skill-status {
+            position: relative;
+            top: 0;
+            text-align: center;
+            margin: 0 auto 0.5cqh;
             font-family: 'PressStart2P', 'Press Start 2P', monospace;
-            font-size: 10px;
-            color: #ffd700;
-            min-height: 1.2rem;
+            font-size: 1.4cqh;
+            color: #ffffff;
+            min-height: 1.6cqh;
             font-weight: bold;
-            text-shadow: 2px 2px 0px #000000;
+            text-shadow: 
+                1.4px 1.4px 0 #000000,
+                -1.4px -1.4px 0 #000000,
+                1.4px -1.4px 0 #000000,
+                -1.4px 1.4px 0 #000000,
+                0 1.4px 0 #000000,
+                1.4px 0 0 #000000,
+                0 -1.4px 0 #000000,
+                -1.4px 0 0 #000000;
             letter-spacing: 1px;
             animation: pulse 1.5s infinite alternate;
-            margin-top: 2px;
+            white-space: nowrap;
+            pointer-events: none;
+            z-index: 50;
+            flex-shrink: 0;
+        }
+            letter-spacing: 1px;
+            animation: pulse 1.5s infinite alternate;
+            white-space: nowrap;
+            pointer-events: none;
+            z-index: 50;
+            flex-shrink: 0;
         }
 
         @keyframes pulse {
-            from { opacity: 0.7; }
-            to { opacity: 1; text-shadow: 0 0 8px #ffd700; }
+            from { opacity: 0.6; }
+            to { opacity: 1; }
         }
 
         main {
@@ -372,46 +485,36 @@
             display: flex;
             justify-content: center;
             align-items: center;
-            padding: 5px 10px;
-            margin-top: -10vh;
+            width: 100%;
             position: relative;
             z-index: 10;
+            margin: 0;
+            padding: 0.2cqh 0;
         }
 
         #board {
             display: grid;
             grid-template-columns: repeat(8, 1fr);
             grid-template-rows: repeat(8, 1fr);
-            gap: 1px;
-            background-color: rgba(26, 40, 62, 0.94);
-            padding: 4px;
-            border-radius: 10px;
-            width: 95vw;
-            max-width: 385px;
+            gap: 1.5px;
+            background: url('assets/grid_bg.png') no-repeat center / 100% 100%;
+            padding: 2.5%;
+            border-radius: 8px;
+            width: 46cqh;
+            max-width: 92cqw;
             aspect-ratio: 1 / 1;
-            border-top: 1.5px solid rgba(255, 255, 255, 0.25);
-            border-left: 1.5px solid rgba(255, 255, 255, 0.25);
-            border-right: 1.5px solid rgba(0, 0, 0, 0.7);
-            border-bottom: 1.5px solid rgba(0, 0, 0, 0.7);
-            box-shadow: 
-                inset 3px 3px 6px rgba(255, 255, 255, 0.08),
-                inset -3px -3px 6px rgba(0, 0, 0, 0.9),
-                0 10px 25px rgba(0, 0, 0, 0.85);
+            border: none;
+            filter: drop-shadow(0 0.5cqh 0 rgba(0, 0, 0, 0.48));
             backdrop-filter: blur(8px);
             position: relative;
             z-index: 10;
         }
 
         .cell {
-            background-color: rgba(38, 56, 84, 0.9);
+            background-color: transparent;
             border-radius: 3px;
-            border-top: 1px solid rgba(0, 0, 0, 0.5);
-            border-left: 1px solid rgba(0, 0, 0, 0.5);
-            border-right: 1px solid rgba(255, 255, 255, 0.08);
-            border-bottom: 1px solid rgba(255, 255, 255, 0.08);
-            box-shadow: 
-                inset 1px 1px 3px rgba(0, 0, 0, 0.7),
-                inset -1px -1px 2px rgba(255, 255, 255, 0.05);
+            border: none;
+            box-shadow: none;
             transition: background-color 0.1s, transform 0.1s;
             overflow: hidden;
         }
@@ -491,27 +594,29 @@
         }
 
         #tray {
-            height: 20vh;
-            min-height: 140px;
+            height: 16cqh;
             display: flex;
             justify-content: center;
             align-items: center;
-            gap: 8px;
-            max-width: 380px;
-            margin: -16vh auto 0;
-            padding: 5px 10px;
+            gap: 2cqw;
+            width: 100%;
+            margin: 0 auto;
+            padding: 0 2cqw;
             position: relative;
+            top: -4.5vh;
             z-index: 50;
             touch-action: none;
             user-select: none;
             -webkit-user-select: none;
+            flex-shrink: 0;
         }
 
         .tray-slot {
-            width: 30.6vw;
-            height: 30.6vw;
-            max-width: 132px;
-            max-height: 132px;
+            width: 30%;
+            height: 100%;
+            max-width: none;
+            max-height: none;
+            aspect-ratio: 1 / 1;
             display: flex;
             justify-content: center;
             align-items: center;
@@ -538,12 +643,10 @@
         }
 
         .piece-block {
-            width: 4.68vw;
-            height: 4.68vw;
-            min-width: 23px;
-            min-height: 23px;
-            max-width: 34px;
-            max-height: 34px;
+            width: 2.8cqh;
+            height: 2.8cqh;
+            max-width: none;
+            max-height: none;
             border-radius: 4px;
             touch-action: none;
             user-select: none;
@@ -557,6 +660,17 @@
             touch-action: none;
             user-select: none;
             -webkit-user-select: none;
+        }
+
+        #crtCanvas {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100vh;
+            pointer-events: none;
+            z-index: 99999;
+            display: block;
         }
 
         #no-space-overlay {
@@ -850,59 +964,69 @@
 </head>
 <body>
 
-    <div class="game-container">
-        <!-- Top Bar: Crown - MAX SCORE - Settings -->
-        <div class="top-bar">
-            <img src="assets/Gemini_Generated_Image_41xbxx41xbxx41xb-removebg-preview.png" alt="bar" class="top-bar-bg">
-            <div class="top-bar-content">
-                <img src="assets/Gemini_Generated_Image_wbdnqbwbdnqbwbdn-removebg-preview.png" alt="crown" class="icon-crown">
-                <div class="max-score-text">
-                    <span class="score-value" id="maxScoreDisplay">0</span>
+    <div id="app-wrapper">
+        <div class="game-container">
+            <!-- Top Bar: Crown - MAX SCORE - Settings -->
+            <div class="top-bar">
+                <img src="assets/top_bar_bg.png" alt="bar" class="top-bar-bg">
+                <div class="top-bar-content">
+                    <img src="assets/crown_icon.png" alt="crown" class="icon-crown">
+                    <div class="max-score-text">
+                        <span class="score-value" id="maxScoreDisplay">0</span>
+                    </div>
+                    <img src="assets/settings_icon.png" alt="settings" class="icon-settings" id="btnSettings">
                 </div>
-                <img src="assets/Gemini_Generated_Image_ooep2eooep2eooep-removebg-preview.png" alt="settings" class="icon-settings" id="btnSettings">
             </div>
-        </div>
 
-        <!-- Lines Cleared Section -->
-        <div class="lines-section">
-            <div class="lines-label">LINES CLEARED: <span id="linesClearedText">0/6</span></div>
-            <div class="lines-blocks" id="linesBlocksContainer">
-                <img src="assets/Pasted_image-removebg-preview.png" alt="empty" class="block blue" id="block-1">
-                <img src="assets/Pasted_image-removebg-preview.png" alt="empty" class="block blue" id="block-2">
-                <img src="assets/Pasted_image-removebg-preview.png" alt="empty" class="block blue" id="block-3">
-                <img src="assets/Pasted_image-removebg-preview.png" alt="empty" class="block blue" id="block-4">
-                <img src="assets/Pasted_image-removebg-preview.png" alt="empty" class="block blue" id="block-5">
-                <img src="assets/Pasted_image-removebg-preview.png" alt="empty" class="block blue" id="block-6">
+            <!-- Lines Cleared Section -->
+            <div class="lines-section">
+                <div class="lines-blocks" id="linesBlocksContainer">
+                    <div class="lines-count-banner">
+                        <span id="linesClearedText" class="lines-count-inline">0/6</span>
+                    </div>
+
+                    <img src="assets/line_block_empty.png" alt="empty" class="block blue" id="block-1">
+                    <img src="assets/line_block_empty.png" alt="empty" class="block blue" id="block-2">
+                    <img src="assets/line_block_empty.png" alt="empty" class="block blue" id="block-3">
+                    <img src="assets/line_block_empty.png" alt="empty" class="block blue" id="block-4">
+                    <img src="assets/line_block_empty.png" alt="empty" class="block blue" id="block-5">
+                    <img src="assets/line_block_empty.png" alt="empty" class="block blue" id="block-6">
+
+                    <div class="coin-container">
+                        <img src="assets/coin_icon.png" alt="coins" class="coins-icon">
+                        <div class="coin-banner-box">
+                            <span class="coin-count-number" id="linesCoinDisplay">0</span>
+                        </div>
+                        <div id="coinPlusOne" class="coin-plus-one">+1</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Bottom Section: Skills - Current Score (Centered) - Shop -->
+            <div class="bottom-section">
+                <img src="assets/btn_skills.png" alt="Skills" class="btn-skills" id="btnSkills">
                 
-                <div class="coin-container">
-                    <img src="assets/Gemini_Generated_Image_5zcunn5zcunn5zcu-removebg-preview.png" alt="coins" class="coins-icon">
-                    <div id="coinPlusOne" class="coin-plus-one">+1</div>
+                <div class="current-score-area">
+                    <div class="score-display-wrapper">
+                        <img src="assets/score_display_bg.png" alt="Current Score" class="score-display-bg">
+                        <div class="current-score-digits" id="currentScoreDisplay">0</div>
+                    </div>
                 </div>
+
+                <img src="assets/btn_shop.png" alt="Shop" class="btn-shop" id="btnShop">
             </div>
         </div>
 
-        <!-- Bottom Section: Skills - Current Score (Centered) - Shop -->
-        <div class="bottom-section">
-            <img src="assets/image-removebg-preview.png" alt="Skills" class="btn-skills" id="btnSkills">
-            
-            <div class="current-score-area">
-                <div class="current-score-label">CURRENT SCORE</div>
-                <div class="current-score-digits" id="currentScoreDisplay">0</div>
-                <div class="skill-status" id="skill-status"></div>
-            </div>
+        <main>
+            <div id="board"></div>
+        </main>
 
-            <img src="assets/image-removebg-preview(1).png" alt="Shop" class="btn-shop" id="btnShop">
+        <div id="tray">
+            <div class="tray-slot" id="slot-0"></div>
+            <div class="tray-slot" id="slot-1"></div>
+            <div class="tray-slot" id="slot-2"></div>
         </div>
-    </div>
-
-    <main>
-        <div id="board"></div>
-    </main>
-
-    <div id="tray">
-        <div class="tray-slot" id="slot-0"></div>
-        <div class="tray-slot" id="slot-1"></div>
-        <div class="tray-slot" id="slot-2"></div>
+        <div class="skill-status" id="skill-status"></div>
     </div>
 
     <div id="game-over">
@@ -939,6 +1063,24 @@
         let lastPlacedColor = null;
         let score = 0;
         let highScore = parseInt(localStorage.getItem('blockBlast3DHighScore8x8')) || 0;
+        let userCoins = 0;
+
+        function updateDigitScaling(element, val, baseSizeCqh) {
+            if (!element) return;
+            const strVal = String(val).replace(/,/g, '').replace(/\./g, '');
+            const numDigits = Math.max(1, strVal.length);
+            const scaleFactor = Math.pow(0.85, numDigits - 1);
+            const finalSize = (baseSizeCqh * scaleFactor).toFixed(2);
+            element.style.fontSize = `${finalSize}cqh`;
+        }
+
+        function updateCoinsDisplay() {
+            const els = document.querySelectorAll('#linesCoinDisplay, #topBarCoinsDisplay, .coin-count-number, .coins-count');
+            els.forEach(el => {
+                el.textContent = userCoins;
+                updateDigitScaling(el, userCoins, 1.88);
+            });
+        }
         let sessionStartHighScore = highScore;
         let achievedNewRecord = false;
         let hasTriggeredRecordScreen = false;
@@ -1045,6 +1187,9 @@
             // Pezzi I 4x1 Orizzontale & Verticale
             { matrix: [[1,1,1,1]] },
             { matrix: [[1],[1],[1],[1]] },
+            // Pezzi I 5x1 Orizzontale & Verticale (Grandi)
+            { matrix: [[1,1,1,1,1]] },
+            { matrix: [[1],[1],[1],[1],[1]] },
             // Pezzi I 1x2, 1x3, 2x1, 3x1
             { matrix: [[1,1]] },
             { matrix: [[1,1,1]] },
@@ -1102,6 +1247,8 @@
         resizeCanvas();
 
         function initBoard() {
+            userCoins = 0;
+            updateCoinsDisplay();
             boardElement.innerHTML = '';
             boardState = Array.from({ length: BOARD_SIZE }, () => Array(BOARD_SIZE).fill(null));
             for (let r = 0; r < BOARD_SIZE; r++) {
@@ -1205,10 +1352,11 @@
 
         function animateTextScore(container, targetScore, duration = 400) {
             if (!container) return;
-            let startScore = parseInt(container.textContent.replace(/,/g, '')) || 0;
+            let startScore = parseInt(container.textContent.replace(/,/g, '').replace(/\./g, '')) || 0;
             const scoreDiff = targetScore - startScore;
             if (scoreDiff === 0) {
                 container.textContent = targetScore.toLocaleString();
+                updateDigitScaling(container, targetScore, 3.6);
                 return;
             }
             const startTime = performance.now();
@@ -1220,11 +1368,13 @@
                 const currentValue = Math.round(startScore + (eased * scoreDiff));
                 
                 container.textContent = currentValue.toLocaleString();
+                updateDigitScaling(container, currentValue, 3.6);
                 
                 if (progress < 1) {
                     requestAnimationFrame(update);
                 } else {
                     container.textContent = targetScore.toLocaleString();
+                    updateDigitScaling(container, targetScore, 3.6);
                 }
             }
             requestAnimationFrame(update);
@@ -1356,28 +1506,44 @@
             checkGameOver();
         }
 
+        let lastFilledCount = -1;
+
         function updateSkillUI() {
             let dots = linesEliminated % 6;
-            const isFull = (linesEliminated > 0 && dots === 0);
-            const filledCount = isFull ? 6 : dots;
+            const filledCount = dots;
+
+            const stepDuration = 0.90;
+            const totalDuration = filledCount > 0 ? (filledCount * stepDuration) + 's' : '1.5s';
+            const hasIncreased = filledCount !== lastFilledCount;
+            lastFilledCount = filledCount;
 
             for (let i = 1; i <= 6; i++) {
                 const blockImg = document.getElementById(`block-${i}`);
                 if (blockImg) {
                     if (i <= filledCount) {
-                        blockImg.src = 'assets/Gemini_Generated_Image_rki7ferki7ferki7-removebg-preview.png';
+                        blockImg.src = 'assets/line_block_filled.png';
+                        blockImg.style.setProperty('--wave-duration', totalDuration);
+                        blockImg.style.setProperty('--wave-delay', ((i - 1) * stepDuration) + 's');
+                        if (hasIncreased) {
+                            blockImg.style.animation = 'none';
+                            void blockImg.offsetWidth;
+                            blockImg.style.animation = '';
+                        }
                         blockImg.className = 'block green';
                     } else {
-                        blockImg.src = 'assets/Pasted_image-removebg-preview.png';
+                        blockImg.src = 'assets/line_block_empty.png';
+                        blockImg.style.removeProperty('--wave-duration');
+                        blockImg.style.removeProperty('--wave-delay');
+                        blockImg.style.animation = '';
                         blockImg.className = 'block blue';
                     }
                 }
             }
 
-            const nextThreshold = (Math.floor(linesEliminated / 6) + 1) * 6;
+            const displayCount = linesEliminated % 6;
             const linesClearedText = document.getElementById('linesClearedText');
             if (linesClearedText) {
-                linesClearedText.textContent = `${linesEliminated}/${nextThreshold}`;
+                linesClearedText.textContent = `${displayCount}/6`;
             }
 
             if (skillStatus) {
@@ -1394,6 +1560,9 @@
         }
 
         function grantSkill() {
+            userCoins += 1;
+            updateCoinsDisplay();
+
             const plusOneEl = document.getElementById('coinPlusOne');
             if (plusOneEl) {
                 plusOneEl.classList.remove('show');
@@ -2547,6 +2716,177 @@ function triggerRainbowSweep(clearedRows, clearedCols) {
         }
 
         initBoard();
+
+        // WebGL CRT Shader Effect
+        (function initCRTEffect() {
+            let crtCanvas = document.getElementById('crtCanvas');
+            if (!crtCanvas) {
+                crtCanvas = document.createElement('canvas');
+                crtCanvas.id = 'crtCanvas';
+                document.body.appendChild(crtCanvas);
+            }
+
+            const gl = crtCanvas.getContext('webgl', { alpha: true, antialias: true }) || 
+                       crtCanvas.getContext('experimental-webgl', { alpha: true, antialias: true });
+            if (!gl) return;
+
+            const vsSource = `
+                attribute vec2 a_position;
+                attribute vec2 a_texCoord;
+                varying vec2 v_texCoord;
+                void main() {
+                    gl_Position = vec4(a_position, 0.0, 1.0);
+                    v_texCoord = a_texCoord;
+                }
+            `;
+
+            const fsSource = `
+                precision mediump float;
+                
+                uniform sampler2D u_texture;
+                uniform vec2 u_resolution;
+                uniform bool u_use_texture;
+                varying vec2 v_texCoord;
+                
+                #define CURVATURE 0.02
+                #define BLOOM 0.5
+                #define VIGNETTE 0.0
+                
+                void main() {
+                    vec2 uv = v_texCoord;
+                    vec2 center = uv - 0.5;
+                
+                    float dist = dot(center, center);
+                    uv += center * (-CURVATURE) * dist;
+                
+                    if (uv.x < 0.0 || uv.x > 1.0 || uv.y < 0.0 || uv.y > 1.0) {
+                        gl_FragColor = vec4(0.0, 0.0, 0.0, 1.0);
+                        return;
+                    }
+                
+                    vec3 color = vec3(0.0);
+
+                    if (u_use_texture) {
+                        color = texture2D(u_texture, uv).rgb;
+                        vec2 texelSize = 1.0 / u_resolution;
+                        vec3 blurred = texture2D(u_texture, uv + vec2(0.0, 1.5) * texelSize).rgb * 0.5;
+                        blurred += texture2D(u_texture, uv - vec2(0.0, 1.5) * texelSize).rgb * 0.5;
+                        color += blurred * BLOOM;
+                    }
+
+                    float resY = max(1.0, u_resolution.y);
+                    float pixel_y = uv.y * resY;
+                    float lineSpace = max(1.0, resY * 0.006); 
+                    float wave = sin(pixel_y * 6.28318 / lineSpace) * 0.5 + 0.5;
+                    
+                    float scanlineBrightness = mix(0.90, 1.0, wave);
+
+                    if (u_use_texture) {
+                        color *= scanlineBrightness;
+                        color += color * wave * 0.05;
+
+                        float vignette = 1.0 - dot(center, center) * VIGNETTE * 4.0;
+                        color *= vignette;
+
+                        float glass_reflection = pow(1.0 - abs(uv.x - 0.5) * 2.0, 2.0);
+                        color += vec3(0.02, 0.02, 0.03) * glass_reflection;
+                        gl_FragColor = vec4(color, 1.0);
+                    } else {
+                        float scanlineDarkness = (1.0 - scanlineBrightness) * 0.85;
+                        float vignetteDarkness = dot(center, center) * VIGNETTE * 3.5;
+                        float glass_reflection = pow(1.0 - abs(uv.x - 0.5) * 2.0, 2.0) * 0.035;
+
+                        vec3 overlayColor = vec3(glass_reflection) + vec3(0.01, 0.03, 0.02) * wave * BLOOM;
+                        float overlayAlpha = clamp(scanlineDarkness + vignetteDarkness, 0.0, 0.70);
+                        gl_FragColor = vec4(overlayColor, overlayAlpha);
+                    }
+                }
+            `;
+
+            function createShader(gl, type, source) {
+                const shader = gl.createShader(type);
+                gl.shaderSource(shader, source);
+                gl.compileShader(shader);
+                if (!gl.getShaderParameter(shader, gl.COMPILE_STATUS)) {
+                    console.error(gl.getShaderInfoLog(shader));
+                    gl.deleteShader(shader);
+                    return null;
+                }
+                return shader;
+            }
+
+            const vs = createShader(gl, gl.VERTEX_SHADER, vsSource);
+            const fs = createShader(gl, gl.FRAGMENT_SHADER, fsSource);
+            if (!vs || !fs) return;
+
+            const program = gl.createProgram();
+            gl.attachShader(program, vs);
+            gl.attachShader(program, fs);
+            gl.linkProgram(program);
+            gl.useProgram(program);
+
+            const posBuf = gl.createBuffer();
+            gl.bindBuffer(gl.ARRAY_BUFFER, posBuf);
+            gl.bufferData(gl.ARRAY_BUFFER, new Float32Array([-1,-1, 1,-1, -1,1, 1,-1, 1,1, -1,1]), gl.STATIC_DRAW);
+
+            const texBuf = gl.createBuffer();
+            gl.bindBuffer(gl.ARRAY_BUFFER, texBuf);
+            gl.bufferData(gl.ARRAY_BUFFER, new Float32Array([0,1, 1,1, 0,0, 1,1, 1,0, 0,0]), gl.STATIC_DRAW);
+
+            const texture = gl.createTexture();
+            gl.bindTexture(gl.TEXTURE_2D, texture);
+            gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.CLAMP_TO_EDGE);
+            gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, gl.CLAMP_TO_EDGE);
+            gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.LINEAR);
+            gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.LINEAR);
+
+            gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, 1, 1, 0, gl.RGBA, gl.UNSIGNED_BYTE, new Uint8Array([0, 0, 0, 0]));
+
+            const posLoc = gl.getAttribLocation(program, 'a_position');
+            const texLoc = gl.getAttribLocation(program, 'a_texCoord');
+            const resLoc = gl.getUniformLocation(program, 'u_resolution');
+            const texLocUnif = gl.getUniformLocation(program, 'u_texture');
+            const useTexLoc = gl.getUniformLocation(program, 'u_use_texture');
+
+            function resize() {
+                crtCanvas.width = Math.max(1, window.innerWidth);
+                crtCanvas.height = Math.max(1, window.innerHeight);
+                gl.viewport(0, 0, crtCanvas.width, crtCanvas.height);
+            }
+            window.addEventListener('resize', resize);
+            resize();
+
+            function render() {
+                gl.clearColor(0.0, 0.0, 0.0, 0.0);
+                gl.clear(gl.COLOR_BUFFER_BIT);
+
+                const sourceCanvas = document.getElementById('gameCanvas');
+                let useTexture = false;
+
+                if (sourceCanvas && sourceCanvas.width > 0 && sourceCanvas.height > 0) {
+                    gl.bindTexture(gl.TEXTURE_2D, texture);
+                    gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, gl.RGBA, gl.UNSIGNED_BYTE, sourceCanvas);
+                    useTexture = true;
+                }
+
+                gl.bindBuffer(gl.ARRAY_BUFFER, posBuf);
+                gl.enableVertexAttribArray(posLoc);
+                gl.vertexAttribPointer(posLoc, 2, gl.FLOAT, false, 0, 0);
+
+                gl.bindBuffer(gl.ARRAY_BUFFER, texBuf);
+                gl.enableVertexAttribArray(texLoc);
+                gl.vertexAttribPointer(texLoc, 2, gl.FLOAT, false, 0, 0);
+
+                gl.uniform2f(resLoc, crtCanvas.width, crtCanvas.height);
+                gl.uniform1i(texLocUnif, 0);
+                gl.uniform1i(useTexLoc, useTexture ? 1 : 0);
+
+                gl.drawArrays(gl.TRIANGLES, 0, 6);
+
+                requestAnimationFrame(render);
+            }
+            render();
+        })();
     </script>
 </body>
 </html>

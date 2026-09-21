@@ -23,7 +23,64 @@ let skillDiscardActive = false;
 let skillRotateActive = false;
 let skillSingleActive = false;
 let turnHasDragged = false;
+let hasPlacedPieceInTurn = false;
 let gameOver = false;
+
+var SKILLS_CONFIG = {
+    shifting_peach: {
+        id: 'shifting_peach',
+        name: 'Shifting Peach 🍑',
+        icon: '🍑',
+        description: 'Tap su un pezzo nel vassoio per cambiarlo casualmente prima di posizionarne uno (1 volta per turno)',
+        price: 40,
+        unlocked: true,
+        active: true,
+        usedThisTurn: false,
+        maxUsesPerTurn: 1
+    },
+    curved_banana: {
+        id: 'curved_banana',
+        name: 'Curved Banana 🍌',
+        icon: '🍌',
+        description: 'Doppio tap su un pezzo nel vassoio per ruotarlo (1 volta per turno)',
+        price: 50,
+        unlocked: false,
+        active: false,
+        usedThisTurn: false,
+        maxUsesPerTurn: 1
+    },
+    single_dot: {
+        id: 'single_dot',
+        name: 'Punto Singolo 🟡',
+        icon: '🟡',
+        description: 'Aggiunge un pezzo gemma 1x1 nel vassoio',
+        price: 40,
+        unlocked: false,
+        active: false,
+        usedThisTurn: false,
+        maxUsesPerTurn: 1
+    }
+};
+
+function isSkillAvailable(skillId) {
+    const skill = SKILLS_CONFIG[skillId];
+    return skill && skill.unlocked && skill.active && !skill.usedThisTurn;
+}
+
+function useSkill(skillId) {
+    const skill = SKILLS_CONFIG[skillId];
+    if (skill) {
+        skill.usedThisTurn = true;
+    }
+}
+
+function resetTurnSkills() {
+    for (const key in SKILLS_CONFIG) {
+        if (SKILLS_CONFIG[key]) {
+            SKILLS_CONFIG[key].usedThisTurn = false;
+        }
+    }
+}
 
 if (highScoreElement) highScoreElement.textContent = highScore;
 
@@ -130,6 +187,12 @@ function initBoard() {
 
     score = 0;
     linesEliminated = 0;
+    if (typeof resetCoins === 'function') {
+        resetCoins();
+    } else if (typeof updateCoinsDisplay === 'function') {
+        userCoins = 0;
+        updateCoinsDisplay();
+    }
     skillDiscardActive = false;
     skillRotateActive = false;
     skillSingleActive = false;
@@ -152,6 +215,15 @@ function easeOutCubic(t) {
     return 1 - Math.pow(1 - t, 3);
 }
 
+function updateDigitScaling(element, val, baseSizeCqh) {
+    if (!element) return;
+    const strVal = String(val).replace(/,/g, '').replace(/\./g, '');
+    const numDigits = Math.max(1, strVal.length);
+    const scaleFactor = Math.pow(0.85, numDigits - 1);
+    const finalSize = (baseSizeCqh * scaleFactor).toFixed(2);
+    element.style.fontSize = `${finalSize}cqh`;
+}
+
 function animateNumberValue(element, start, end, duration = 400) {
     if (!element) return;
     if (element._animFrameId) {
@@ -167,6 +239,10 @@ function animateNumberValue(element, start, end, duration = 400) {
         startVal = parseInt(element.textContent) || 0;
     }
 
+    if (element && element.id === 'currentScoreDisplay') {
+        updateDigitScaling(element, end, 3.6);
+    }
+
     if (startVal === end) {
         element.textContent = end;
         element._currentDisplayedValue = end;
@@ -180,6 +256,10 @@ function animateNumberValue(element, start, end, duration = 400) {
         const progress = Math.min(elapsed / duration, 1);
         const easedProgress = easeOutCubic(progress);
         const currentVal = Math.round(startVal + (end - startVal) * easedProgress);
+
+        if (element && element.id === 'currentScoreDisplay') {
+            updateDigitScaling(element, currentVal, 3.6);
+        }
 
         element.textContent = currentVal;
         element._currentDisplayedValue = currentVal;
@@ -988,7 +1068,12 @@ document.addEventListener('DOMContentLoaded', () => {
 
     if (btnSettings) {
         btnSettings.addEventListener('click', () => {
-            console.log('Impostazioni aperte');
+            if (typeof window.toggleCrtEffect === 'function') {
+                const isEnabled = window.toggleCrtEffect();
+                console.log('Filtro CRT:', isEnabled ? 'Attivato' : 'Disattivato');
+            } else {
+                console.log('Impostazioni aperte');
+            }
         });
     }
     if (btnSkills) {
