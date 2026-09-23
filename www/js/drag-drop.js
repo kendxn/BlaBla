@@ -143,19 +143,28 @@ let dragState = null;
                 const cellHeight = boardRect.height / BOARD_SIZE;
 
                 const rect = targetPiece.getBoundingClientRect();
-                const offsetX = e.clientX - rect.left;
-                const offsetY = e.clientY - rect.top;
+                const unscaledWidth = targetPiece.offsetWidth || rect.width;
+                const unscaledHeight = targetPiece.offsetHeight || rect.height;
 
                 const pieceFirstBlock = targetPiece.querySelector('.piece-block');
                 const pieceBlockWidth = pieceFirstBlock ? pieceFirstBlock.offsetWidth : cellWidth;
                 const scaleFactor = pieceBlockWidth > 0 ? (cellWidth / pieceBlockWidth) : 1;
 
+                const scaledWidth = unscaledWidth * scaleFactor;
+                const scaledHeight = unscaledHeight * scaleFactor;
+
+                const FIXED_LIFT_Y = 160;
+                const scaledOffsetX = scaledWidth / 2;
+                const scaledOffsetY = scaledHeight + FIXED_LIFT_Y;
+
                 dragState = {
                     element: targetPiece,
                     slotIndex,
                     shape,
-                    offsetX,
-                    offsetY,
+                    scaledWidth,
+                    scaledHeight,
+                    scaledOffsetX,
+                    scaledOffsetY,
                     hasMoved: false,
                     startX,
                     startY,
@@ -165,7 +174,13 @@ let dragState = null;
                     cellHeight,
                     scaleFactor,
                     latestX: e.clientX,
-                    latestY: e.clientY
+                    latestY: e.clientY,
+                    prevX: e.clientX,
+                    prevY: e.clientY,
+                    extX: 0,
+                    extY: 0,
+                    targetExtX: 0,
+                    targetExtY: 0
                 };
 
                 window.addEventListener('pointermove', onDrag, { passive: false });
@@ -286,16 +301,16 @@ let dragState = null;
                     targetRow = lastPreviewRow;
                     targetCol = lastPreviewCol;
                 } else {
-                    const { boardRect, cellWidth, cellHeight, offsetX, offsetY, scaleFactor, latestX, latestY } = dragState;
-                    const scaledOffsetX = offsetX * scaleFactor;
-                    const scaledOffsetY = offsetY * scaleFactor;
-                    const scaledLiftY = 70 * scaleFactor;
+                    const { boardRect, cellWidth, cellHeight, scaledOffsetX, scaledOffsetY, latestX, latestY, extX = 0, extY = 0 } = dragState;
 
-                    const dropX = (latestX - scaledOffsetX) - boardRect.left;
-                    const dropY = (latestY - scaledOffsetY - scaledLiftY) - boardRect.top;
+                    const finalX = (latestX - scaledOffsetX) + extX;
+                    const finalY = (latestY - scaledOffsetY) + extY;
 
-                    const col = Math.floor((dropX + cellWidth * 0.25) / cellWidth);
-                    const row = Math.floor((dropY + cellHeight * 0.25) / cellHeight);
+                    const dropX = finalX - boardRect.left;
+                    const dropY = finalY - boardRect.top;
+
+                    const col = Math.floor((dropX + cellWidth * 0.5) / cellWidth);
+                    const row = Math.floor((dropY + cellHeight * 0.5) / cellHeight);
 
                     if (canPlace(dragState.shape.matrix, row, col)) {
                         targetRow = row;
@@ -307,16 +322,28 @@ let dragState = null;
                 resetPieceElementStyle(element);
 
                 if (targetRow !== -1 && targetCol !== -1) {
+                    let sumR = 0, sumC = 0, count = 0;
+                    const matrix = dragState.shape.matrix;
+                    for (let r = 0; r < matrix.length; r++) {
+                        for (let c = 0; c < matrix[r].length; c++) {
+                            if (matrix[r][c]) {
+                                sumR += (targetRow + r + 0.5);
+                                sumC += (targetCol + c + 0.5);
+                                count++;
+                            }
+                        }
+                    }
+                    const placedPos = {
+                        percentX: count > 0 ? (sumC / count / BOARD_SIZE) * 100 : 50,
+                        percentY: count > 0 ? (sumR / count / BOARD_SIZE) * 100 : 50
+                    };
+
                     placePiece(dragState.shape, targetRow, targetCol);
                     element.remove();
                     activePieces = activePieces.filter(p => p.slot !== currentSlot);
                     hasPlacedPieceInTurn = true;
-                    
-                    if (typeof resetTurnSkills === 'function') {
-                        resetTurnSkills();
-                    }
 
-                    checkLines();
+                    checkLines(placedPos);
                     spawnPieces();
                 }
 
@@ -339,8 +366,10 @@ let dragState = null;
                 el.style.height = `${el.offsetHeight}px`;
                 el.classList.add('dragging');
                 el.style.position = 'fixed';
-                el.style.transformOrigin = `${dragState.offsetX}px ${dragState.offsetY}px`;
-                el.style.willChange = 'transform, left, top';
+                el.style.transformOrigin = '0 0';
+                el.style.willChange = 'transform';
+                dragState.prevX = e.clientX;
+                dragState.prevY = e.clientY;
             }
 
             if (dragState.hasMoved) {
@@ -352,26 +381,64 @@ let dragState = null;
         }
 
         function processDragFrame() {
-            isDragFramePending = false;
-            if (!dragState || !dragState.hasMoved) return;
+            if (!dragState || !dragState.hasMoved) {
+                isDragFramePending = false;
+                return;
+            }
 
-            const { element, offsetX, offsetY, scaleFactor, boardRect, cellWidth, cellHeight, shape } = dragState;
+            const { element, scaledOffsetX, scaledOffsetY, scaleFactor, boardRect, cellWidth, cellHeight, shape } = dragState;
             const clientX = dragState.latestX;
             const clientY = dragState.latestY;
 
-            element.style.left = `${clientX - offsetX}px`;
-            element.style.top = `${clientY - offsetY}px`;
-            element.style.transform = `scale(${scaleFactor}) translateY(-70px) translateZ(0)`;
+            // 1. Calcolo Vettore di Movimento (Delta tra i frame)
+            const deltaX = clientX - dragState.prevX;
+            const deltaY = clientY - dragState.prevY;
+            dragState.prevX = clientX;
+            dragState.prevY = clientY;
 
-            const scaledOffsetX = offsetX * scaleFactor;
-            const scaledOffsetY = offsetY * scaleFactor;
-            const scaledLiftY = 70 * scaleFactor;
+            // 2. Calcolo Spinta Direzionale Potenziata verso i Bordi della Griglia
+            const boardCenterX = boardRect.left + boardRect.width / 2;
+            const boardCenterY = boardRect.top + boardRect.height / 2;
+            const relX = (clientX - boardCenterX) / (boardRect.width / 2);
+            const relY = (clientY - boardCenterY) / (boardRect.height / 2);
 
-            const dropX = (clientX - scaledOffsetX) - boardRect.left;
-            const dropY = (clientY - scaledOffsetY - scaledLiftY) - boardRect.top;
+            // 3. Offset Dinamico Aggiuntivo (-10% Sensibilità per posizionamento preciso)
+            const VELOCITY_SENSITIVITY = 2.14;
+            const EDGE_PUSH_WEIGHT = 36;
+            const rawTargetExtX = (deltaX * VELOCITY_SENSITIVITY) + (Math.max(-1.2, Math.min(1.2, relX)) * EDGE_PUSH_WEIGHT);
+            const rawTargetExtY = (deltaY * VELOCITY_SENSITIVITY) + (Math.max(-1.2, Math.min(1.2, relY)) * EDGE_PUSH_WEIGHT);
 
-            const col = Math.floor((dropX + cellWidth * 0.25) / cellWidth);
-            const row = Math.floor((dropY + cellHeight * 0.25) / cellHeight);
+            // 4. Clamping Potenziato
+            const MAX_EXT_X = 55;
+            const MAX_EXT_Y = 55;
+            dragState.targetExtX = Math.max(-MAX_EXT_X, Math.min(MAX_EXT_X, rawTargetExtX));
+            dragState.targetExtY = Math.max(-MAX_EXT_Y, Math.min(MAX_EXT_Y, rawTargetExtY));
+
+            // 5. Interpolazione Lineare (LERP) per Movimento Fluido a 60 FPS (-10% lissaggio)
+            const LERP_ALPHA = 0.166;
+            dragState.extX += (dragState.targetExtX - dragState.extX) * LERP_ALPHA;
+            dragState.extY += (dragState.targetExtY - dragState.extY) * LERP_ALPHA;
+
+            // Decadimento naturale della velocità target
+            dragState.targetExtX *= 0.80;
+            dragState.targetExtY *= 0.80;
+
+            // 6. Posizione Finale: X centrato perfettamente su dito, Y con offset fisso sopra dito + Extension Dinamica
+            const finalX = (clientX - scaledOffsetX) + dragState.extX;
+            const finalY = (clientY - scaledOffsetY) + dragState.extY;
+
+            // 7. Rendering con GPU Accelerata translate3d (Origin 0 0)
+            element.style.left = '0px';
+            element.style.top = '0px';
+            element.style.transformOrigin = '0 0';
+            element.style.transform = `translate3d(${finalX}px, ${finalY}px, 0px) scale(${scaleFactor})`;
+
+            // 8. Calcolo Cella Griglia matching esatto con tolleranza bilanciata (0.5 cellWidth)
+            const dropX = finalX - boardRect.left;
+            const dropY = finalY - boardRect.top;
+
+            const col = Math.floor((dropX + cellWidth * 0.5) / cellWidth);
+            const row = Math.floor((dropY + cellHeight * 0.5) / cellHeight);
 
             if (row !== lastPreviewRow || col !== lastPreviewCol) {
                 lastPreviewRow = row;
@@ -381,6 +448,12 @@ let dragState = null;
                 } else {
                     clearPreview();
                 }
+            }
+
+            if (dragState && dragState.hasMoved) {
+                requestAnimationFrame(processDragFrame);
+            } else {
+                isDragFramePending = false;
             }
         }
 
@@ -460,23 +533,30 @@ function drawRoundRect(ctx, x, y, w, h, r) {
 }
 
 class Particle {
-  constructor(x, y, color, vx, vy) {
+  constructor(x, y, color) {
     this.x = x;
     this.y = y;
     this.color = color;
-    this.vx = vx;
-    this.vy = vy;
-    this.size = 2 + Math.random() * 5;
+    const angle = Math.random() * Math.PI * 2;
+    const speed = 2 + Math.random() * 5.5;
+    this.vx = Math.cos(angle) * speed;
+    this.vy = Math.sin(angle) * speed - (1.5 + Math.random() * 2.5);
+    this.gravity = 0.3 + Math.random() * 0.15;
+    this.size = 3 + Math.random() * 6;
     this.life = 1;
-    this.decay = 0.04 + Math.random() * 0.03;
-    this.friction = 0.94;
+    this.decay = 0.02 + Math.random() * 0.02;
+    this.friction = 0.95;
+    this.rotation = Math.random() * Math.PI * 2;
+    this.rotSpeed = (Math.random() - 0.5) * 0.2;
   }
   
   update() {
     this.x += this.vx;
     this.y += this.vy;
+    this.vy += this.gravity;
     this.vx *= this.friction;
     this.vy *= this.friction;
+    this.rotation += this.rotSpeed;
     this.life -= this.decay;
   }
   
@@ -486,11 +566,20 @@ class Particle {
     ctx.globalAlpha = Math.max(0, this.life);
     ctx.fillStyle = this.color;
     ctx.shadowColor = this.color;
-    ctx.shadowBlur = 6;
+    ctx.shadowBlur = 4;
+    ctx.translate(this.x, this.y);
+    ctx.rotate(this.rotation);
     const s = Math.max(0.5, this.size * this.life);
-    drawRoundRect(ctx, this.x - s/2, this.y - s/2, s, s, s * 0.10);
+    drawRoundRect(ctx, -s/2, -s/2, s, s, s * 0.15);
     ctx.fill();
     ctx.restore();
+  }
+}
+
+function spawnParticles(x, y, color) {
+  const count = 5 + Math.floor(Math.random() * 4);
+  for (let i = 0; i < count; i++) {
+    particles.push(new Particle(x, y, color));
   }
 }
 
@@ -815,7 +904,161 @@ function triggerRainbowSweep(clearedRows, clearedCols) {
   }, 150);
 }
 
-        function checkLines() {
+        function triggerScreenShake(linesCleared, combo) {
+            if (!boardElement) return;
+            boardElement.classList.remove('shaking', 'shaking-light', 'shaking-medium', 'shaking-heavy');
+            void boardElement.offsetWidth;
+
+            if (linesCleared >= 3 || combo >= 5) {
+                boardElement.classList.add('shaking-heavy');
+            } else if (linesCleared === 2 || combo >= 2) {
+                boardElement.classList.add('shaking-medium');
+            } else {
+                boardElement.classList.add('shaking-light');
+            }
+        }
+
+        function calculateCentroid(rowsToClear, colsToClear) {
+            let sumX = 0;
+            let sumY = 0;
+            let totalCells = 0;
+            const cellPositions = new Set();
+
+            rowsToClear.forEach(r => {
+                for (let c = 0; c < BOARD_SIZE; c++) {
+                    const key = `${r},${c}`;
+                    if (!cellPositions.has(key)) {
+                        cellPositions.add(key);
+                        sumY += (r + 0.5) / BOARD_SIZE;
+                        sumX += (c + 0.5) / BOARD_SIZE;
+                        totalCells++;
+                    }
+                }
+            });
+
+            colsToClear.forEach(c => {
+                for (let r = 0; r < BOARD_SIZE; r++) {
+                    const key = `${r},${c}`;
+                    if (!cellPositions.has(key)) {
+                        cellPositions.add(key);
+                        sumY += (r + 0.5) / BOARD_SIZE;
+                        sumX += (c + 0.5) / BOARD_SIZE;
+                        totalCells++;
+                    }
+                }
+            });
+
+            if (totalCells === 0) {
+                return { percentX: 50, percentY: 50 };
+            }
+
+            return {
+                percentX: (sumX / totalCells) * 100,
+                percentY: (sumY / totalCells) * 100
+            };
+        }
+
+        function triggerPointsPopupVFX(points, posX, posY) {
+            if (!boardElement || points <= 0) return;
+
+            const ptsPopup = document.createElement('div');
+            ptsPopup.className = 'popup-points-vfx';
+            ptsPopup.style.left = `${posX}%`;
+            ptsPopup.style.top = `${posY}%`;
+            ptsPopup.textContent = `+${points}`;
+
+            boardElement.appendChild(ptsPopup);
+
+            const removePts = () => {
+                if (ptsPopup && ptsPopup.parentElement) {
+                    ptsPopup.remove();
+                }
+            };
+
+            ptsPopup.addEventListener('animationend', removePts, { once: true });
+            setTimeout(removePts, 950);
+        }
+
+        function triggerPopupTextVFX(linesCleared, combo, centroid, points = 0) {
+            if (!boardElement) return;
+
+            let mainTitle = '';
+            let subTitle = '';
+
+            if (linesCleared === 2) {
+                mainTitle = 'DOUBLE!';
+            } else if (linesCleared === 3) {
+                mainTitle = 'TRIPLE!';
+            } else if (linesCleared === 4) {
+                mainTitle = 'EXCELLENT!';
+            } else if (linesCleared === 5) {
+                mainTitle = 'AMAZING!';
+            } else if (linesCleared >= 6) {
+                mainTitle = 'UNBELIEVABLE!';
+            }
+
+            if (combo >= 2) {
+                subTitle = `COMBO x${combo}`;
+                if (!mainTitle) {
+                    if (combo === 2) mainTitle = 'GREAT!';
+                    else if (combo === 3) mainTitle = 'AWESOME!';
+                    else if (combo === 4) mainTitle = 'FANTASTIC!';
+                    else if (combo === 5) mainTitle = 'IMPRESSIVE!';
+                    else if (combo === 6) mainTitle = 'REMARKABLE!';
+                    else if (combo === 7) mainTitle = 'BRILLIANT!';
+                    else if (combo >= 8) mainTitle = 'SUPERB!';
+                }
+            }
+
+            const rawX = centroid ? centroid.percentX : 50;
+            const rawY = centroid ? centroid.percentY : 50;
+            const posX = Math.max(25, Math.min(75, rawX));
+            const posY = Math.max(26, Math.min(74, rawY));
+
+            if (!mainTitle && !subTitle) {
+                if (points > 0) {
+                    triggerPointsPopupVFX(points, posX, posY);
+                }
+                return;
+            }
+
+            const popup = document.createElement('div');
+            popup.className = 'popup-text-vfx';
+            popup.style.left = `${posX}%`;
+            popup.style.top = `${posY}%`;
+
+            let innerHTML = '';
+            if (mainTitle) {
+                let colorClass = '';
+                if (mainTitle === 'REMARKABLE!' || mainTitle === 'BRILLIANT!') {
+                    colorClass = ' fuchsia-title';
+                } else if (mainTitle === 'SUPERB!') {
+                    colorClass = ' red-title';
+                }
+                innerHTML += `<div class="popup-title${colorClass}">${mainTitle}</div>`;
+            }
+            if (subTitle) innerHTML += `<div class="popup-sub">${subTitle}</div>`;
+            popup.innerHTML = innerHTML;
+
+            boardElement.appendChild(popup);
+
+            let hasChained = false;
+            const chainNextVFX = () => {
+                if (hasChained) return;
+                hasChained = true;
+                if (popup && popup.parentElement) {
+                    popup.remove();
+                }
+                if (points > 0) {
+                    triggerPointsPopupVFX(points, posX, posY);
+                }
+            };
+
+            popup.addEventListener('animationend', chainNextVFX, { once: true });
+            setTimeout(chainNextVFX, 840);
+        }
+
+        function checkLines(placedPos) {
             let rowsToClear = [];
             let colsToClear = [];
 
@@ -835,22 +1078,51 @@ function triggerRainbowSweep(clearedRows, clearedCols) {
                 if (full) colsToClear.push(c);
             }
 
-            if (rowsToClear.length === 0 && colsToClear.length === 0) return;
+            const linesCleared = rowsToClear.length + colsToClear.length;
 
-            if (boardElement) {
-                boardElement.classList.remove('shaking');
-                void boardElement.offsetWidth;
-                boardElement.classList.add('shaking');
+            if (linesCleared === 0) {
+                consecutiveClears = 0;
+                if (comboTolerance > 0) {
+                    comboTolerance--;
+                    if (comboTolerance === 0) {
+                        comboLevel = 1;
+                    }
+                } else {
+                    comboTolerance = 0;
+                    comboLevel = 1;
+                }
+                comboCount = comboLevel;
+                if (typeof updateComboToleranceUI === 'function') updateComboToleranceUI();
+                return;
             }
 
-            const linesCleared = rowsToClear.length + colsToClear.length;
-            let points = linesCleared * 10;
-            if (linesCleared > 1) points += linesCleared * 5;
-            updateScore(points);
+            consecutiveClears++;
+            if (consecutiveClears >= 2 || comboTolerance > 0 || linesCleared >= 2) {
+                comboTolerance = 3;
+                comboLevel++;
+            } else {
+                comboTolerance = 0;
+                comboLevel = 1;
+            }
+            comboCount = comboLevel;
+            if (typeof updateComboToleranceUI === 'function') updateComboToleranceUI();
+
+            triggerScreenShake(linesCleared, comboCount);
+
+            let linePoints = 0;
+            if (comboCount >= 2) {
+                linePoints = (comboCount * 10) + (linesCleared * 10);
+            } else {
+                linePoints = linesCleared * 10;
+            }
+            updateScore(linePoints);
+
+            const popupPos = placedPos || calculateCentroid(rowsToClear, colsToClear);
+            triggerPopupTextVFX(linesCleared, comboCount, popupPos, linePoints);
             
-            for(let i=0; i<linesCleared; i++){
+            for (let i = 0; i < linesCleared; i++) {
                 linesEliminated++;
-                if(linesEliminated % 6 === 0){
+                if (linesEliminated % 6 === 0) {
                     grantSkill();
                 }
             }

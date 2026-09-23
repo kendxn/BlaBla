@@ -414,7 +414,7 @@
             left: 50%;
             transform: translate(-50%, -50%);
             font-family: 'PressStart2P', 'Press Start 2P', monospace;
-            font-size: 3.6cqh;
+            font-size: 4.32cqh;
             color: #ffffff;
             text-shadow: 
                 2px 2px 0 #000000,
@@ -431,7 +431,7 @@
         }
 
         .current-score-digits.long-score {
-            font-size: 3.2cqh;
+            font-size: 3.84cqh;
         }
 
         .skill-status {
@@ -944,17 +944,175 @@
             z-index: 0;
         }
 
-        /* --- ANIMAZIONE SHAKE RIDOTTA DEL 30% --- */
-        @keyframes cameraShake {
+        /* --- ANIMAZIONI SCREEN SHAKE DINAMICHE --- */
+        @keyframes cameraShakeLight {
             0%   { transform: translate(0, 0); }
-            25%  { transform: translate(-1.5px, 0.8px); }
-            50%  { transform: translate(1.2px, -1.2px); }
-            75%  { transform: translate(-0.8px, 0.8px); }
+            25%  { transform: translate(-2px, 1.5px); }
+            50%  { transform: translate(2px, -1.5px); }
+            75%  { transform: translate(-1.5px, 1px); }
             100% { transform: translate(0, 0); }
         }
 
-        .shaking { 
-            animation: cameraShake 0.3s ease-in-out; 
+        @keyframes cameraShakeMedium {
+            0%   { transform: translate(0, 0); }
+            20%  { transform: translate(-4.5px, 3.5px) rotate(-0.6deg); }
+            40%  { transform: translate(4.5px, -3.5px) rotate(0.6deg); }
+            60%  { transform: translate(-3.5px, 2.5px); }
+            80%  { transform: translate(3px, -2px); }
+            100% { transform: translate(0, 0); }
+        }
+
+        @keyframes cameraShakeHeavy {
+            0%   { transform: translate(0, 0); }
+            15%  { transform: translate(-5px, 3.9px) rotate(-1deg); }
+            30%  { transform: translate(5px, -3.9px) rotate(1deg); }
+            45%  { transform: translate(-3.9px, 2.8px) rotate(-0.67deg); }
+            60%  { transform: translate(3.9px, -2.2px) rotate(0.67deg); }
+            75%  { transform: translate(-2.2px, 1.7px); }
+            90%  { transform: translate(1.1px, -1.1px); }
+            100% { transform: translate(0, 0); }
+        }
+
+        .shaking, .shaking-light { 
+            animation: cameraShakeLight 0.12s ease-in-out; 
+        }
+
+        .shaking-medium {
+            animation: cameraShakeMedium 0.22s ease-in-out;
+        }
+
+        .shaking-heavy {
+            animation: cameraShakeHeavy 0.35s ease-in-out;
+        }
+
+        /* --- POPUP TESTO VFX (OVERSHOOT ELASTIC OUT & CENTROIDE) --- */
+        @keyframes popupOvershoot {
+            0% {
+                transform: translate(-50%, -50%) scale(0);
+                opacity: 0;
+            }
+            32% {
+                transform: translate(-50%, -50%) scale(1.18);
+                opacity: 1;
+            }
+            50% {
+                transform: translate(-50%, -50%) scale(0.95);
+                opacity: 1;
+            }
+            68% {
+                transform: translate(-50%, -50%) scale(1.04);
+                opacity: 1;
+            }
+            82% {
+                transform: translate(-50%, -60%) scale(1.0);
+                opacity: 1;
+            }
+            100% {
+                transform: translate(-50%, -85%) scale(1.0);
+                opacity: 0;
+            }
+        }
+
+        .popup-text-vfx {
+            position: absolute;
+            transform: translate(-50%, -50%);
+            pointer-events: none;
+            z-index: 999;
+            text-align: center;
+            font-family: 'PressStart2P', 'Press Start 2P', monospace;
+            animation: popupOvershoot 0.84s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards;
+            white-space: nowrap;
+            max-width: 85%;
+            box-sizing: border-box;
+        }
+
+        .popup-text-vfx .popup-title {
+            font-size: clamp(0.54rem, 2.27cqh, 1.32rem);
+            font-weight: bold;
+            color: #ffe600;
+            text-shadow: 
+                2px 2px 0 #000,
+                -2px -2px 0 #000,
+                2px -2px 0 #000,
+                -2px 2px 0 #000,
+                0 3px 0 #000,
+                3px 0 0 #000,
+                0 -3px 0 #000,
+                -3px 0 0 #000;
+            filter: drop-shadow(0 5px 6px rgba(0,0,0,0.85));
+            letter-spacing: 1.6px;
+        }
+
+        .popup-text-vfx .popup-title.fuchsia-title {
+            color: #ff26d4;
+        }
+
+        .popup-text-vfx .popup-title.red-title {
+            color: #ff2222;
+        }
+
+        .popup-text-vfx .popup-sub {
+            font-size: clamp(0.50rem, 1.83cqh, 1.06rem);
+            font-weight: bold;
+            color: #38bdf8;
+            margin-top: 5px;
+            text-shadow: 
+                1.5px 1.5px 0 #000,
+                -1.5px -1.5px 0 #000,
+                1.5px -1.5px 0 #000,
+                -1.5px 1.5px 0 #000,
+                0 2.5px 0 #000,
+                2.5px 0 0 #000;
+            filter: drop-shadow(0 3px 5px rgba(0,0,0,0.8));
+            letter-spacing: 1.2px;
+        }
+
+        /* --- POPUP POINTS VFX (FASE 3: +PUNTI CHAINING) --- */
+        @keyframes popupPointsFloat {
+            0% {
+                transform: translate(-50%, -40%) scale(0);
+                opacity: 0;
+            }
+            25% {
+                transform: translate(-50%, -50%) scale(1.2);
+                opacity: 1;
+            }
+            40% {
+                transform: translate(-50%, -55%) scale(1.0);
+                opacity: 1;
+            }
+            75% {
+                transform: translate(-50%, -75%) scale(1.0);
+                opacity: 1;
+            }
+            100% {
+                transform: translate(-50%, -100%) scale(0.9);
+                opacity: 0;
+            }
+        }
+
+        .popup-points-vfx {
+            position: absolute;
+            transform: translate(-50%, -50%);
+            pointer-events: none;
+            z-index: 1000;
+            text-align: center;
+            font-family: 'PressStart2P', 'Press Start 2P', monospace;
+            font-size: clamp(0.50rem, 2.02cqh, 1.15rem);
+            font-weight: bold;
+            color: #ffffff;
+            text-shadow: 
+                2px 2px 0 #000,
+                -2px -2px 0 #000,
+                2px -2px 0 #000,
+                -2px 2px 0 #000,
+                0 3px 0 #000,
+                3px 0 0 #000,
+                0 -3px 0 #000,
+                -3px 0 0 #000;
+            filter: drop-shadow(0 5px 8px rgba(0,0,0,0.9));
+            animation: popupPointsFloat 0.9s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards;
+            white-space: nowrap;
         }
 
         #vfx-canvas {

@@ -51,12 +51,23 @@ function refreshDOMElements() {
         var activePieces = [];
         
         var linesEliminated = 0;
+        var comboCount = 0;
+        var comboTolerance = 0;
+        var comboLevel = 1;
+        var consecutiveClears = 0;
         var skillDiscardActive = false;
         var skillRotateActive = false;
         var skillSingleActive = false;
         var turnHasDragged = false;
         var hasPlacedPieceInTurn = false;
         var gameOver = false;
+
+        function updateComboToleranceUI() {
+            const linesClearedText = document.getElementById('linesClearedText') || document.querySelector('#linesClearedText');
+            if (linesClearedText) {
+                linesClearedText.textContent = `${comboTolerance}/3`;
+            }
+        }
 
         var SKILLS_CONFIG = {
             shifting_peach: {
@@ -74,10 +85,10 @@ function refreshDOMElements() {
                 id: 'curved_banana',
                 name: 'Curved Banana 🍌',
                 icon: '🍌',
-                description: 'Doppio tap su un pezzo nel vassoio per ruotarlo (1 volta per turno)',
+                description: 'Doppio tap su un pezzo nel vassoio per ruotarlo (1 volta per turno di 3 pezzi)',
                 price: 50,
-                unlocked: false,
-                active: false,
+                unlocked: true,
+                active: true,
                 usedThisTurn: false,
                 maxUsesPerTurn: 1
             },
